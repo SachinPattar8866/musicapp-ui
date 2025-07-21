@@ -4,72 +4,131 @@ import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
 import styles from './AudioPlayer.module.css';
 
 const AudioPlayer = () => {
-    const { currentTrack, isPlaying, togglePlayPause, playNext, playPrev } = useContext(PlayerContext);
-    const [progress, setProgress] = useState(0);
-    const audioRef = useRef(null);
+    const { 
+        currentTrack, 
+        isPlaying, 
+        duration,
+        currentTime,
+        togglePlayPause, 
+        playNextTrack, 
+        playPreviousTrack,
+        seekTo,
+        formatTime
+    } = useContext(PlayerContext);
+    
+    const [isDragging, setIsDragging] = useState(false);
+    const [sliderPosition, setSliderPosition] = useState(0);
+    const timelineRef = useRef(null);
+    const lastTimeRef = useRef(currentTime);
 
+    // Keep track of the last time when paused
     useEffect(() => {
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.play().catch(() => {});
-            } else {
-                audioRef.current.pause();
-            }
+        if (!isDragging) {
+            setSliderPosition(currentTime);
+            lastTimeRef.current = currentTime;
         }
-    }, [isPlaying, currentTrack]);
+    }, [currentTime, isDragging]);
 
+    // Update slider position while dragging
     useEffect(() => {
-        const audio = audioRef.current;
-
-        const updateProgress = () => {
-            const current = audio.currentTime;
-            const total = audio.duration || 1;
-            setProgress((current / total) * 100);
-        };
-
-        audio?.addEventListener('timeupdate', updateProgress);
-
-        return () => {
-            audio?.removeEventListener('timeupdate', updateProgress);
-        };
-    }, [currentTrack]);
+        if (!isDragging) {
+            setSliderPosition(currentTime);
+        }
+    }, [currentTime, isDragging]);
 
     if (!currentTrack) return null;
 
+    const handleTimelineClick = (e) => {
+        if (!timelineRef.current) return;
+        
+        const rect = timelineRef.current.getBoundingClientRect();
+        const pos = (e.clientX - rect.left) / rect.width;
+        const newTime = pos * duration;
+        seekTo(newTime);
+    };
+
+    const handleTimelineChange = (e) => {
+        const newTime = parseFloat(e.target.value);
+        setSliderPosition(newTime);
+        if (!isDragging) {
+            seekTo(newTime);
+        }
+    };
+
     return (
-        <div className={`fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 shadow-md z-50 ${styles.playerBar}`}>
-            <div className="flex items-center justify-between max-w-4xl mx-auto">
-                {/* Song Info */}
-                <div className="flex items-center gap-4">
-                    <img
-                        src={currentTrack?.thumbnail || '/default-thumbnail.jpg'}
-                        alt={currentTrack.title}
-                        className="w-12 h-12 rounded"
+        <div className={styles.playerContainer}>
+            <div className={styles.playerContent}>
+                <div className={styles.trackInfo}>
+                    <img 
+                        src={
+                            currentTrack.coverImage?.startsWith('http')
+                                ? currentTrack.coverImage
+                                : currentTrack.coverImage
+                                    ? `${import.meta.env.VITE_API_BASE_URL}/images/${currentTrack.coverImage}`
+                                    : new URL('../../assets/default-thumbnail.jpg', import.meta.url).href
+                        }
+                        alt={currentTrack.name} 
+                        className={styles.albumCover}
                     />
-                    <div>
-                        <h4 className="font-semibold text-sm">{currentTrack.title}</h4>
-                        <p className="text-xs text-gray-300">{currentTrack.artist}</p>
+                    <div className={styles.trackDetails}>
+                        <h4 className={styles.trackName}>{currentTrack.name}</h4>
+                        <p className={styles.artistName}>{currentTrack.artistName}</p>
                     </div>
                 </div>
 
-                {/* Controls */}
-                <div className="flex items-center gap-4">
-                    <button onClick={playPrev}><FaStepBackward /></button>
-                    <button onClick={togglePlayPause} className="text-xl">
-                        {isPlaying ? <FaPause /> : <FaPlay />}
-                    </button>
-                    <button onClick={playNext}><FaStepForward /></button>
-                </div>
+                <div className={styles.mainSection}>
+                    <div className={styles.controls}>
+                        <button onClick={playPreviousTrack} className={styles.controlButton}>
+                            <FaStepBackward />
+                        </button>
+                        
+                        <button onClick={togglePlayPause} className={`${styles.controlButton} ${styles.playPauseButton}`}>
+                            {isPlaying ? <FaPause /> : <FaPlay />}
+                        </button>
+                        
+                        <button onClick={playNextTrack} className={styles.controlButton}>
+                            <FaStepForward />
+                        </button>
+                    </div>
 
-                {/* Progress Bar */}
-                <div className="w-full absolute bottom-0 left-0 right-0 h-1 bg-gray-600">
-                    <div
-                        className="h-full bg-red-500"
-                        style={{ width: `${progress}%` }}
-                    />
+                    <div className={styles.timelineContainer}>
+                        <span className={styles.time}>{formatTime(currentTime)}</span>
+                        <div className={styles.timeline} ref={timelineRef}>
+                            <div 
+                                className={styles.progressTrack}
+                                onClick={handleTimelineClick}
+                            >
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max={duration || 0}
+                                    value={isDragging ? sliderPosition : currentTime}
+                                    onChange={handleTimelineChange}
+                                    onMouseDown={() => setIsDragging(true)}
+                                    onMouseUp={(event) => {
+                                        setIsDragging(false);
+                                        const newTime = parseFloat(event.target.value);
+                                        setSliderPosition(newTime);
+                                        seekTo(newTime);
+                                    }}
+                                    onTouchStart={() => setIsDragging(true)}
+                                    onTouchEnd={(event) => {
+                                        setIsDragging(false);
+                                        const newTime = parseFloat(event.target.value);
+                                        setSliderPosition(newTime);
+                                        seekTo(newTime);
+                                    }}
+                                    className={styles.timelineSlider}
+                                />
+                                <div 
+                                    className={styles.progressFill}
+                                    style={{ width: `${(currentTime / duration) * 100}%` }}
+                                />
+                            </div>
+                        </div>
+                        <span className={styles.time}>{formatTime(duration)}</span>
+                    </div>
                 </div>
-
-                <audio ref={audioRef} src={currentTrack.url} />
             </div>
         </div>
     );

@@ -1,5 +1,15 @@
-.playerBar {
+.playerContainer {
+    position: fixed;
+    bottom: 0;
+    left: 257px; /* Width of the sidebar */
+    right: 30px;
+    background-color: #030303;
+    color: white;
+    z-index: 50;
     animation: slideUp 0.3s ease-in-out;
+    margin-right: 12px; /* Space for scrollbar */
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+    max-width: calc(100% - 252px); /* 240px sidebar + 12px scrollbar margin */
 }
 
 @keyframes slideUp {
@@ -9,4 +19,220 @@
     to {
         transform: translateY(0%);
     }
+}
+
+.progressBar {
+    width: 100%;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.1);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.progressFill {
+    height: 100%;
+    background-color: #ff0000;
+    transition: width 0.1s linear;
+}
+
+.playerContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    gap: 0.75rem;
+    margin: 0 auto;
+    width: 100%;
+    height: 72px;
+    max-width: 1200px; /* Match content width */
+}
+
+.trackInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 0 0 25%;
+    min-width: 180px;
+    max-width: 300px;
+    padding-right: 1rem;
+}
+
+.albumCover {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.trackDetails {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    gap: 2px;
+}
+
+.trackName {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: white;
+    margin: 0;
+    line-height: 1;
+}
+
+.artistName {
+    color: #aaa;
+    font-size: 0.7rem;
+    margin: 0;
+}
+
+.mainSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    max-width: 45%;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 0.5rem;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.controlButton {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.25rem;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.controlButton:hover {
+    opacity: 1;
+}
+
+.playPauseButton {
+    font-size: 1.5rem;
+}
+
+.timelineContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 0 1rem;
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.trackName, .artistName {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.time {
+    color: #aaa;
+    font-size: 0.75rem;
+    min-width: 45px;
+    font-variant-numeric: tabular-nums;
+}
+
+.timeline {
+    flex-grow: 1;
+    position: relative;
+    height: 4px;
+}
+
+.progressTrack {
+    position: relative;
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.progressFill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #ff0000;
+    border-radius: 2px;
+    pointer-events: none;
+    transition: width 0.1s linear;
+}
+
+.timelineSlider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    outline: none;
+    margin: 0;
+    padding: 0;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.timelineSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    margin-top: -4px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.timelineSlider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.progressTrack:hover .timelineSlider::-webkit-slider-thumb {
+    opacity: 1;
+}
+
+.progressTrack:hover .timelineSlider::-moz-range-thumb {
+    opacity: 1;
+}
+
+/* Larger hit area for better touch interaction */
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    bottom: -8px;
+    cursor: pointer;
 }

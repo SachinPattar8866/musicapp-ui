@@ -17,4 +17,6 @@
     flex: 1;
     overflow-y: auto;
     padding: 16px;
+    padding-bottom: calc(90px + 2rem); /* Height of audio player + extra padding */
+    margin-right: 12px; /* Space for scrollbar */
 }

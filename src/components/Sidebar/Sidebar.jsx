@@ -1,47 +1,58 @@
-// src/components/Sidebar/Sidebar.jsx (RE-UPDATED FOR CLARITY)
 import React from 'react';
 import styles from './Sidebar.module.css';
 import { NavLink } from 'react-router-dom';
-import HomeIcon from '../../assets/icons/home.svg?react';
-import SearchIcon from '../../assets/icons/search.svg?react';
-import LibraryIcon from '../../assets/icons/library.svg?react';
+import { FaHome, FaSearch, FaMusic, FaHistory } from 'react-icons/fa';
+import { MdLibraryMusic, MdPlaylistPlay } from 'react-icons/md';
+import { BiLike } from 'react-icons/bi';
 
 const Sidebar = () => {
     return (
         <aside className={styles.sidebar}>
-            <div className={styles.logo}>
-                <h1>Musicify</h1>
-            </div>
-
             <nav className={styles.nav}>
-                <NavLink to="/" className={({ isActive }) => isActive ? styles.active : styles.link}>
-                    <HomeIcon className={styles.icon} /> Home
-                </NavLink>
-                <NavLink to="/search" className={({ isActive }) => isActive ? styles.active : styles.link}>
-                    <SearchIcon className={styles.icon} /> Search
-                </NavLink>
-                <NavLink to="/library" className={({ isActive }) => isActive ? styles.active : styles.link}>
-                    <LibraryIcon className={styles.icon} /> Library
-                </NavLink>
+                <div className={styles.section}>
+                    <NavLink to="/" className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}>
+                        <FaHome className={styles.icon} />
+                        <span>Home</span>
+                    </NavLink>
+                    <NavLink to="/explore" className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}>
+                        <FaSearch className={styles.icon} />
+                        <span>Explore</span>
+                    </NavLink>
+                    <NavLink to="/library" className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}>
+                        <MdLibraryMusic className={styles.icon} />
+                        <span>Library</span>
+                    </NavLink>
+                </div>
+
+                <div className={`${styles.section} ${styles.librarySection}`}>
+                    <NavLink to="/liked-songs" className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}>
+                        <BiLike className={styles.icon} />
+                        <span>Liked Songs</span>
+                    </NavLink>
+                    <NavLink to="/history" className={({ isActive }) => `${styles.link} ${isActive ? styles.active : ''}`}>
+                        <FaHistory className={styles.icon} />
+                        <span>History</span>
+                    </NavLink>
+                </div>
+
+                <div className={styles.playlistsSection}>
+                    <h3 className={styles.playlistHeader}>PLAYLISTS</h3>
+                    <div className={styles.playlistScroll}>
+                        <NavLink to="/playlist/workout" className={({ isActive }) => `${styles.playlistLink} ${isActive ? styles.active : ''}`}>
+                            <MdPlaylistPlay className={styles.icon} />
+                            <span>Workout Mix</span>
+                        </NavLink>
+                        <NavLink to="/playlist/chill" className={({ isActive }) => `${styles.playlistLink} ${isActive ? styles.active : ''}`}>
+                            <MdPlaylistPlay className={styles.icon} />
+                            <span>Chill Vibes</span>
+                        </NavLink>
+                        <NavLink to="/playlist/favorites" className={({ isActive }) => `${styles.playlistLink} ${isActive ? styles.active : ''}`}>
+                            <MdPlaylistPlay className={styles.icon} />
+                            <span>Favorites</span>
+                        </NavLink>
+                    </div>
+                </div>
             </nav>
-
-            <div className={styles.playlists}>
-                <h3 className={styles.playlistSectionTitle}>Your Playlists</h3> {/* Add this title */}
-
-                {/* Convert these to NavLinks */}
-                <NavLink to="/liked-songs" className={({ isActive }) => isActive ? styles.playlistItemActive : styles.playlistItem}>
-                    Liked Songs
-                </NavLink>
-                <NavLink to="/playlist/workout-vibes" className={({ isActive }) => isActive ? styles.playlistItemActive : styles.playlistItem}>
-                    Workout Vibes
-                </NavLink>
-                <NavLink to="/playlist/chillout" className={({ isActive }) => isActive ? styles.playlistItemActive : styles.playlistItem}>
-                    Chillout
-                </NavLink>
-                <NavLink to="/playlist/party-hits" className={({ isActive }) => isActive ? styles.playlistItemActive : styles.playlistItem}>
-                    Party Hits
-                </NavLink>
-            </div>
         </aside>
     );
 };

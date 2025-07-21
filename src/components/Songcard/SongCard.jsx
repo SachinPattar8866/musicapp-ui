@@ -1,35 +1,51 @@
-// src/components/SongCard/SongCard.jsx
-
-import React, { useContext } from 'react';
-import { PlayerContext } from '../../context/PlayerContext'; // Assuming this context
-import styles from './SongCard.module.css'; // Assuming you have a CSS module for SongCard
+import React, { useContext, useState } from 'react';
+import { PlayerContext } from '../../context/PlayerContext';
+import styles from './SongCard.module.css';
+// Import the default thumbnail image
+const defaultThumbnail = new URL('../../assets/default-thumbnail.jpg', import.meta.url).href;
 
 const SongCard = ({ song }) => {
-    const { playTrack } = useContext(PlayerContext); // Assuming playTrack function
+    const { playTrack } = useContext(PlayerContext);
+    const [imageError, setImageError] = useState(false);
 
     const handlePlay = () => {
         playTrack(song);
     };
 
-    // --- CRITICAL CHANGE HERE ---
-    // Construct the URL to your new image proxy endpoint
-    // It will look like: /api/image-proxy?imageUrl=https%3A%2F%2Fusercontent.jamendo.com%2F...
-    const proxiedImageUrl = song.coverImage
-        ? `/api/image-proxy?imageUrl=${encodeURIComponent(song.coverImage)}`
-        : '/default-thumbnail.jpg'; // Fallback to a local default image if no coverImage URL is present
+    const handleImageError = () => {
+        setImageError(true);
+    };
+
+    // Use the image URL directly if it's a complete URL, otherwise prepend the API base URL
+    const imageUrl = imageError ? defaultThumbnail : (
+        song.coverImage?.startsWith('http') 
+            ? song.coverImage 
+            : song.coverImage 
+                ? `${import.meta.env.VITE_API_BASE_URL}/images/${song.coverImage}`
+                : defaultThumbnail
+    );
 
     return (
-        <div
-            className={`bg-gray-800 hover:bg-gray-700 p-4 rounded-lg shadow-md cursor-pointer transition-transform transform hover:scale-105 ${styles.card}`}
-            onClick={handlePlay}
-        >
-            <img
-                src={proxiedImageUrl} // <--- This is the key: Use the URL that points to your backend proxy
-                alt={song.name} // Always provide an alt text for accessibility
-                className="w-full h-40 object-cover rounded mb-2"
-            />
-            <h3 className="text-white font-semibold text-sm truncate">{song.name}</h3>
-            <p className="text-gray-400 text-xs">{song.artistName}</p>
+        <div className={styles.card} onClick={handlePlay}>
+            <div className={styles.imageContainer}>
+                <img
+                    src={imageUrl}
+                    alt={song.name}
+                    onError={handleImageError}
+                    className={styles.image}
+                />
+                <div className={styles.playOverlay}>
+                    <button className={styles.playButton}>
+                        <svg viewBox="0 0 24 24" className={styles.playIcon}>
+                            <path fill="currentColor" d="M8 5v14l11-7z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div className={styles.info}>
+                <h3 className={styles.title}>{song.name}</h3>
+                <p className={styles.artist}>{song.artistName}</p>
+            </div>
         </div>
     );
 };

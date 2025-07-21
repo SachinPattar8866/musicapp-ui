@@ -19,17 +19,18 @@ const AppRoutes = () => {
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route element={<MainLayout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/music/:id" element={<MusicDetails />} />
+            </Route>
 
             {/* Protected Routes - require authentication */}
             <Route element={<ProtectedRoute />}>
-                {/* Routes that use MainLayout and are protected */}
-                <Route element={<MainLayout />}>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/search" element={<Search />} />
+                <Route element={<MainLayout />}> 
                     <Route path="/library" element={<Library />} />
                     <Route path="/playlist/:id" element={<PlaylistDetailsPage />} />
-                    <Route path="/liked-songs" element={<LikedSongsPage />} /> {/* <-- Verify this route */}
-                    <Route path="/music/:id" element={<MusicDetails />} />
+                    <Route path="/liked-songs" element={<LikedSongsPage />} />
                     <Route path="/profile" element={<Profile />} />
                 </Route>
             </Route>

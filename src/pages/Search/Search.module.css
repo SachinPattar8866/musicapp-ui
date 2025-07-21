@@ -1,3 +1,10 @@
+
+.container {
+    margin-left: 240px;
+    padding-right: 12px;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
 .searchForm {
     display: flex;
     gap: 1rem;

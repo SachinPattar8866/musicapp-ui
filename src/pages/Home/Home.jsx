@@ -37,24 +37,27 @@ const Home = () => {
     }, [user]); // <-- ADD USER TO DEPENDENCY ARRAY
 
     return (
-        <div className="px-4 py-6">
-            <h2 className={styles.sectionTitle}>Popular Songs</h2>
-            <div className={styles.gridContainer}>
-                {songs.map((song) => (
-                    <SongCard key={song.id} song={song} />
-                ))}
+        <div className={styles.container}>
+            <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Popular Songs</h2>
+                <div className={styles.gridContainer}>
+                    {songs.map((song) => (
+                        <SongCard key={song.id} song={song} />
+                    ))}
+                </div>
             </div>
 
-            <h2 className={styles.sectionTitle}>Your Playlists</h2>
-            <div className={styles.gridContainer}>
-                {/* Only render if playlists are available */}
-                {playlists.length > 0 ? (
-                    playlists.map((playlist) => (
-                        <PlaylistCard key={playlist.id} playlist={playlist} />
-                    ))
-                ) : (
-                    <p className="text-gray-400">No playlists found. Log in to see your playlists.</p>
-                )}
+            <div className={styles.section}>
+                <h2 className={styles.sectionTitle}>Your Playlists</h2>
+                <div className={styles.gridContainer}>
+                    {playlists.length > 0 ? (
+                        playlists.map((playlist) => (
+                            <PlaylistCard key={playlist.id} playlist={playlist} />
+                        ))
+                    ) : (
+                        <p className={styles.emptyMessage}>No playlists found. Log in to see your playlists.</p>
+                    )}
+                </div>
             </div>
         </div>
     );

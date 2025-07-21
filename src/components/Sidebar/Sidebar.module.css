@@ -1,75 +1,114 @@
-/* src/components/Sidebar/Sidebar.module.css (Apply/Verify these styles) */
+.sidebar {
+    width: 240px;
+    height: calc(100vh - 64px);
+    background-color: #030303;
+    color: white;
+    padding: 8px;
+    overflow-y: auto;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
 
-/* General container for the navigation links */
 .nav {
     display: flex;
-    flex-direction: column; /* Stack links vertically */
-    gap: 10px; /* Space between each navigation item */
-    margin-bottom: 30px; /* Space below the main navigation */
+    flex-direction: column;
 }
 
-/* Base styles for all NavLink items (both active and inactive) */
-.link, .active {
-    display: flex; /* <-- CRITICAL: Make each NavLink a flex container */
-    align-items: center; /* <-- CRITICAL: Vertically center the icon and text */
-    padding: 10px 15px; /* Adjust padding as desired */
-    border-radius: 8px; /* Slightly rounded corners for the link background */
-    text-decoration: none; /* Remove underline from links */
-    font-size: 16px; /* Consistent font size for link text */
-    font-weight: 500;
-    transition: background-color 0.2s ease, color 0.2s ease; /* Smooth transition for hover/active states */
-    color: #b3b3b3; /* Default text color for inactive links */
+.section {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Styles for the active NavLink item */
-.active {
-    background-color: #2a2a2a; /* Darker background for the active link */
-    color: #1DB954; /* Vibrant accent color for the active text/icon (e.g., green like Spotify or white/red for YouTube Music style) */
-    /* You might prefer a bright white for active text, like YouTube Music: */
-    /* color: #ffffff; */
-}
-
-/* Styles for the SVG icons within the NavLink */
-.icon {
-    width: 24px; /* Fixed width for the icon */
-    height: 24px; /* Fixed height for the icon */
-    margin-right: 12px; /* Space between the icon and the text */
-    fill: currentColor; /* Allows the SVG to inherit the 'color' property from its parent (.link or .active) */
-    flex-shrink: 0; /* Prevent the icon from shrinking if space is constrained */
-}
-
-/* Styles for the Playlists section */
-.playlists {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #333; /* A separator line above playlists */
-    padding-left: 15px; /* Align playlist items with nav links if desired */
-}
-
-.playlistSectionTitle { /* Add a title for the playlists section if you want */
-    color: #b3b3b3;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin-bottom: 15px;
-}
-
-.playlistItem {
-    /* These styles apply to the NavLink (or p tag if you keep them as text) */
-    padding: 8px 0; /* Adjust padding for playlist items */
-    color: #b3b3b3;
+.link {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
     text-decoration: none;
-    font-size: 15px;
-    cursor: pointer; /* Indicate clickability */
-    transition: color 0.2s ease;
+    color: #909090;
+    font-size: 14px;
+    transition: all 0.2s;
+    border-radius: 4px;
+    margin: 0 4px;
 }
 
-.playlistItem:hover {
-    color: #fff; /* White on hover */
+.link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* If playlist items are also NavLinks, add an active state */
-.playlistItem.active {
-    color: #1DB954; /* Or your chosen accent color for active playlist */
-    font-weight: 600;
+.link.active {
+    color: #FF0000;
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+.icon {
+    margin-right: 24px;
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.librarySection {
+    margin-top: 8px;
+}
+
+.playlistsSection {
+    margin-top: 16px;
+    padding-bottom: 16px;
+}
+
+.playlistHeader {
+    color: #909090;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0 28px;
+    margin: 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.playlistScroll {
+    overflow-y: auto;
+    max-height: calc(100vh - 400px);
+}
+
+.playlistLink {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    text-decoration: none;
+    color: #909090;
+    font-size: 14px;
+    transition: all 0.2s;
+    border-radius: 4px;
+    margin: 0 4px;
+}
+
+.playlistLink:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.playlistLink.active {
+    color: #FF0000;
+    background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* Scrollbar styling */
+.sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.4);
 }
