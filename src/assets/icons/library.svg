@@ -1,0 +1,4 @@
+<!-- src/assets/icons/library.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24">
+    <path d="M4 3h16a1 1 0 011 1v16.5a.5.5 0 01-.854.354L12 13.707 3.854 20.854A.5.5 0 013 20.5V4a1 1 0 011-1z"/>
+</svg>

@@ -1,0 +1,75 @@
+/* src/components/Sidebar/Sidebar.module.css (Apply/Verify these styles) */
+
+/* General container for the navigation links */
+.nav {
+    display: flex;
+    flex-direction: column; /* Stack links vertically */
+    gap: 10px; /* Space between each navigation item */
+    margin-bottom: 30px; /* Space below the main navigation */
+}
+
+/* Base styles for all NavLink items (both active and inactive) */
+.link, .active {
+    display: flex; /* <-- CRITICAL: Make each NavLink a flex container */
+    align-items: center; /* <-- CRITICAL: Vertically center the icon and text */
+    padding: 10px 15px; /* Adjust padding as desired */
+    border-radius: 8px; /* Slightly rounded corners for the link background */
+    text-decoration: none; /* Remove underline from links */
+    font-size: 16px; /* Consistent font size for link text */
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease; /* Smooth transition for hover/active states */
+    color: #b3b3b3; /* Default text color for inactive links */
+}
+
+/* Styles for the active NavLink item */
+.active {
+    background-color: #2a2a2a; /* Darker background for the active link */
+    color: #1DB954; /* Vibrant accent color for the active text/icon (e.g., green like Spotify or white/red for YouTube Music style) */
+    /* You might prefer a bright white for active text, like YouTube Music: */
+    /* color: #ffffff; */
+}
+
+/* Styles for the SVG icons within the NavLink */
+.icon {
+    width: 24px; /* Fixed width for the icon */
+    height: 24px; /* Fixed height for the icon */
+    margin-right: 12px; /* Space between the icon and the text */
+    fill: currentColor; /* Allows the SVG to inherit the 'color' property from its parent (.link or .active) */
+    flex-shrink: 0; /* Prevent the icon from shrinking if space is constrained */
+}
+
+/* Styles for the Playlists section */
+.playlists {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #333; /* A separator line above playlists */
+    padding-left: 15px; /* Align playlist items with nav links if desired */
+}
+
+.playlistSectionTitle { /* Add a title for the playlists section if you want */
+    color: #b3b3b3;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+.playlistItem {
+    /* These styles apply to the NavLink (or p tag if you keep them as text) */
+    padding: 8px 0; /* Adjust padding for playlist items */
+    color: #b3b3b3;
+    text-decoration: none;
+    font-size: 15px;
+    cursor: pointer; /* Indicate clickability */
+    transition: color 0.2s ease;
+}
+
+.playlistItem:hover {
+    color: #fff; /* White on hover */
+}
+
+/* If playlist items are also NavLinks, add an active state */
+.playlistItem.active {
+    color: #1DB954; /* Or your chosen accent color for active playlist */
+    font-weight: 600;
+}

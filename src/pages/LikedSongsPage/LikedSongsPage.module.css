@@ -1,0 +1,39 @@
+/* src/pages/LikedSongsPage/LikedSongsPage.module.css */
+
+.container {
+    /* Basic padding and background for the content area */
+    padding: 30px;
+    background-color: #121212; /* Dark background for the main content */
+    min-height: calc(100vh - 80px); /* Adjust based on your Navbar/Player height */
+    color: #fff; /* Default text color */
+
+    /* Offset for fixed sidebar: Ensure this page content starts after the sidebar */
+    margin-left: 250px; /* Assuming your sidebar is 250px wide and fixed to the left */
+
+    /* Consider if you have a main content wrapper in App.jsx/AppRoutes.jsx
+       that handles this margin. If so, apply global content styles there. */
+}
+
+.title {
+    font-size: 2.5rem; /* Large title for the page */
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #fff;
+    padding-left: 10px; /* Small indent to align with content */
+}
+
+.grid {
+    display: grid;
+    /* Responsive grid: 2 columns on small screens, up to 6 on large */
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Min card width 160px */
+    gap: 20px; /* Space between song cards */
+    padding: 0 10px; /* Inner padding for the grid */
+}
+
+.emptyText {
+    color: #b3b3b3; /* Lighter gray for instructional text */
+    font-size: 1rem;
+    text-align: center;
+    grid-column: 1 / -1; /* Make it span across all grid columns */
+    padding: 50px 0; /* Vertical padding for empty message */
+}

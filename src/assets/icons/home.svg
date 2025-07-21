@@ -1,0 +1,4 @@
+<!-- src/assets/icons/home.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white">
+    <path d="M3 9.75L12 3l9 6.75v10.5A1.75 1.75 0 0119.25 22h-4.5A1.75 1.75 0 0113 20.25V15h-2v5.25A1.75 1.75 0 019.25 22h-4.5A1.75 1.75 0 013 20.25V9.75z" />
+</svg>

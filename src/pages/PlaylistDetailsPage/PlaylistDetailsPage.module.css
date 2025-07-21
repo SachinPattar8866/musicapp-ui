@@ -1,0 +1,72 @@
+/* src/pages/PlaylistDetailsPage/PlaylistDetailsPage.module.css */
+
+.container {
+    padding: 30px;
+    background-color: #121212; /* Dark background */
+    min-height: calc(100vh - 80px); /* Adjust based on navbar/player height */
+    color: #fff;
+    margin-left: 250px; /* Offset for the fixed sidebar width */
+}
+
+.header {
+    display: flex;
+    align-items: flex-end; /* Align items to the bottom */
+    gap: 30px; /* Space between thumbnail and text */
+    margin-bottom: 40px; /* Space below header */
+    padding-left: 10px; /* Small indent for header content */
+    padding-bottom: 20px; /* Add some padding below the header section itself */
+    background: linear-gradient(to bottom, #303030, #121212); /* Subtle gradient for header background */
+    border-radius: 8px; /* Match container border-radius if any */
+    margin-bottom: 30px; /* Space after header section */
+}
+
+.thumbnail {
+    width: 230px; /* Larger size for the main playlist cover */
+    height: 230px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6); /* More prominent shadow */
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Push content to bottom */
+}
+
+.subTitle { /* Could be used for a small "Playlist" text above the title */
+    font-size: 0.9rem;
+    color: #b3b3b3;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.title {
+    font-size: 4rem; /* Very large title font for prominent display */
+    font-weight: 900; /* Extra bold */
+    margin-bottom: 10px;
+    color: #fff;
+    /* text-shadow: 2px 2px 4px rgba(0,0,0,0.5); */ /* Optional text shadow */
+}
+
+.description {
+    font-size: 1rem;
+    color: #b3b3b3;
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+.songsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); /* Same responsive grid as liked songs */
+    gap: 20px;
+    padding: 0 10px; /* Inner padding for the grid */
+}
+
+.emptyText {
+    color: #b3b3b3;
+    font-size: 1rem;
+    text-align: center;
+    grid-column: 1 / -1;
+    padding: 50px 0;
+}

@@ -1,0 +1,46 @@
+.container {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.thumbnail {
+    width: 200px;
+    height: 200px;
+    border-radius: 1rem;
+    object-fit: cover;
+    background-color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.details {
+    text-align: center;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.artist,
+.album,
+.duration {
+    color: #9ca3af;
+    font-size: 1rem;
+    margin: 0.25rem 0;
+}
+
+.playButton {
+    margin-top: 1.5rem;
+    background-color: #1db954;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 9999px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+}
