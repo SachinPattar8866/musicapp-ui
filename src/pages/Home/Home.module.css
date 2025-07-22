@@ -1,7 +1,5 @@
 .container {
     padding: 24px 32px;
-    margin-left: 240px; /* Match the sidebar width */
-    width: calc(100% - 240px); /* Subtract sidebar width */
     min-height: calc(100vh - 64px); /* Subtract navbar height */
     background-color: #030303;
     overflow-y: auto;
@@ -11,11 +9,31 @@
     margin-bottom: 48px;
 }
 
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
 .sectionTitle {
     font-size: 24px;
     font-weight: 700;
-    margin-bottom: 24px;
     color: white;
+    margin: 0;
+}
+
+.viewAllLink {
+    color: #1DB954; /* Spotify green color */
+    font-size: 14px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.viewAllLink:hover {
+    color: #1ed760; /* Lighter green on hover */
+    text-decoration: underline;
 }
 
 .gridContainer {
@@ -39,8 +57,6 @@
 
 @media (max-width: 768px) {
     .container {
-        margin-left: 0;
-        width: 100%;
         padding: 16px;
     }
     

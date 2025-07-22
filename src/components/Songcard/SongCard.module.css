@@ -66,6 +66,39 @@
     justify-content: center;
 }
 
+.likeButton {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+}
+
+.card:hover .likeButton {
+    opacity: 1;
+}
+
+.heartIcon, .heartIconFilled {
+    width: 16px;
+    height: 16px;
+}
+
+.heartIconFilled {
+    color: #FF0000;
+}
+
 .playIcon {
     width: 36px;
     height: 36px;

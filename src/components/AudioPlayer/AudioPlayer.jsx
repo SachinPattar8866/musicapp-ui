@@ -1,6 +1,9 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { PlayerContext } from '../../context/PlayerContext';
-import { FaPlay, FaPause, FaStepForward, FaStepBackward } from 'react-icons/fa';
+import { FaPlay, FaPause, FaStepForward, FaStepBackward, FaHeart } from 'react-icons/fa';
+import { FiHeart } from 'react-icons/fi';
+import likeService from '../../services/likeService';
+import useAuth from '../../hooks/useAuth';
 import styles from './AudioPlayer.module.css';
 
 const AudioPlayer = () => {
@@ -13,11 +16,16 @@ const AudioPlayer = () => {
         playNextTrack, 
         playPreviousTrack,
         seekTo,
-        formatTime
+        formatTime,
+        addToLikedTracks,
+        removeFromLikedTracks,
+        isTrackLiked
     } = useContext(PlayerContext);
     
+    const { isAuthenticated } = useAuth();
     const [isDragging, setIsDragging] = useState(false);
     const [sliderPosition, setSliderPosition] = useState(0);
+    const [liked, setLiked] = useState(false);
     const timelineRef = useRef(null);
     const lastTimeRef = useRef(currentTime);
 
@@ -35,6 +43,13 @@ const AudioPlayer = () => {
             setSliderPosition(currentTime);
         }
     }, [currentTime, isDragging]);
+    
+    // Update like status when track changes
+    useEffect(() => {
+        if (currentTrack) {
+            setLiked(isTrackLiked(currentTrack.id));
+        }
+    }, [currentTrack, isTrackLiked]);
 
     if (!currentTrack) return null;
 
@@ -45,6 +60,25 @@ const AudioPlayer = () => {
         const pos = (e.clientX - rect.left) / rect.width;
         const newTime = pos * duration;
         seekTo(newTime);
+    };
+    
+    const handleToggleLike = async () => {
+        if (!isAuthenticated) {
+            alert('Please login to like songs');
+            return;
+        }
+        
+        try {
+            if (liked) {
+                await removeFromLikedTracks(currentTrack.id);
+                setLiked(false);
+            } else {
+                await addToLikedTracks(currentTrack);
+                setLiked(true);
+            }
+        } catch (error) {
+            console.error('Error toggling like:', error);
+        }
     };
 
     const handleTimelineChange = (e) => {
@@ -71,7 +105,19 @@ const AudioPlayer = () => {
                         className={styles.albumCover}
                     />
                     <div className={styles.trackDetails}>
-                        <h4 className={styles.trackName}>{currentTrack.name}</h4>
+                        <div className={styles.trackNameContainer}>
+                            <h4 className={styles.trackName}>{currentTrack.name}</h4>
+                            <button 
+                                className={styles.likeButton}
+                                onClick={handleToggleLike}
+                                title={liked ? 'Unlike' : 'Like'}
+                            >
+                                {liked ? 
+                                    <FaHeart className={styles.heartIconFilled} /> : 
+                                    <FiHeart className={styles.heartIcon} />
+                                }
+                            </button>
+                        </div>
                         <p className={styles.artistName}>{currentTrack.artistName}</p>
                     </div>
                 </div>

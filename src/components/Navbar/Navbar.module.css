@@ -6,17 +6,20 @@
     height: 64px;
     background-color: #030303;
     color: white;
-    position: sticky;
+    position: fixed; /* Change to fixed instead of sticky */
     top: 0;
+    left: 0; /* Start from the left edge */
+    right: 0; /* Extend to the right edge */
+    width: 100%; /* Take full width */
     z-index: 100;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .leftSection {
     display: flex;
     align-items: center;
-    flex: 1;
-    max-width: 728px;
+    width: 33%; /* Set a fixed width percentage */
     gap: 24px;
 }
 
@@ -49,8 +52,9 @@
     padding: 0 16px;
     height: 40px;
     width: 100%;
-    max-width: 640px;
+    max-width: 500px; /* Adjusted for better center alignment */
     transition: background-color 0.2s;
+    margin: 0 auto; /* This centers the search form within its container */
 }
 
 .searchForm:hover, .searchForm:focus-within {
@@ -77,10 +81,20 @@
     color: #909090;
 }
 
+.middleSection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 0 16px;
+}
+
 .rightSection {
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 33%; /* Match the left section width */
+    justify-content: flex-end;
 }
 
 .iconButton {
@@ -123,7 +137,7 @@
 .profileDropdown {
     position: absolute;
     top: 44px;
-    right: 0;
+    right: -16px; /* Adjust to align with the right edge of the screen */
     background: #181818;
     border-radius: 10px;
     box-shadow: 0 2px 16px rgba(0,0,0,0.25);
@@ -134,6 +148,22 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 1.2rem;
+    /* Fix for dropdown going off-screen */
+    max-width: 95vw; /* Ensure it doesn't exceed viewport width */
+    max-height: calc(100vh - 100px); /* Ensure it doesn't exceed viewport height */
+    overflow-y: auto; /* Add scrolling if content is too tall */
+    animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .profileInfo {
