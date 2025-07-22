@@ -1,7 +1,9 @@
 // src/context/PlayerProvider.jsx
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PlayerContext } from './PlayerContext';
+import likeService from '../services/likeService';
+import historyService from '../services/historyService';
 
 const PlayerProvider = ({ children }) => {
     const [currentTrack, setCurrentTrack] = useState(null);
@@ -10,8 +12,38 @@ const PlayerProvider = ({ children }) => {
     const [currentTime, setCurrentTime] = useState(0);
     const [playlist, setPlaylist] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(-1);
+    const [likedTracks, setLikedTracks] = useState([]);
     const audioRef = useRef(new Audio());
+    
+    // Track if the history update has been done for current track
+    const historyUpdatedRef = useRef(false);
 
+    // Fetch liked tracks
+    useEffect(() => {
+        const fetchLikedTracks = async () => {
+            try {
+                let tracks;
+                try {
+                    // First try likeService
+                    tracks = await likeService.getLikedTracks();
+                } catch (likeError) {
+                    console.log('Error with likeService, trying musicService:', likeError);
+                    // If that fails, try musicService directly
+                    const musicService = await import('../services/musicService');
+                    tracks = await musicService.default.getLikedSongs();
+                }
+                
+                console.log('Fetched liked tracks in PlayerProvider:', tracks);
+                setLikedTracks(Array.isArray(tracks) ? tracks : []);
+            } catch (error) {
+                console.error('Error fetching liked tracks:', error);
+                setLikedTracks([]);
+            }
+        };
+        
+        fetchLikedTracks();
+    }, []);
+    
     useEffect(() => {
         const audio = audioRef.current;
         let lastPlayedTime = currentTime;
@@ -23,6 +55,12 @@ const PlayerProvider = ({ children }) => {
             // Update progress bar CSS variable
             const progress = (audio.currentTime / audio.duration) * 100;
             document.documentElement.style.setProperty('--progress', `${progress}%`);
+            
+            // Add to history as soon as the song starts playing (even a fraction of a second)
+            if (audio.currentTime > 0 && !historyUpdatedRef.current && currentTrack) {
+                addToHistory(currentTrack);
+                historyUpdatedRef.current = true;
+            }
         };
         
         const handleLoadedMetadata = () => {
@@ -57,6 +95,9 @@ const PlayerProvider = ({ children }) => {
                 audio.src = currentTrack.audioUrl;
                 audio.load();
                 lastPlayedTime = previousTime;
+                // Reset history tracking for new track and add it to history immediately
+                historyUpdatedRef.current = false;
+                addToHistory(currentTrack);
             }
 
             if (isPlaying) {
@@ -97,8 +138,14 @@ const PlayerProvider = ({ children }) => {
             }
         }
 
+        // Add to history immediately when track is selected to play
+        addToHistory(track);
+        
         setCurrentTrack(track);
         setIsPlaying(true);
+        
+        // Reset history flag since we're playing a new track
+        historyUpdatedRef.current = false;
     };
 
     const togglePlayPause = () => {
@@ -110,6 +157,9 @@ const PlayerProvider = ({ children }) => {
         
         const nextIndex = (currentIndex + 1) % playlist.length;
         setCurrentIndex(nextIndex);
+        
+        // Reset history flag for the new track
+        historyUpdatedRef.current = false;
         playTrack(playlist[nextIndex]);
     };
 
@@ -118,6 +168,9 @@ const PlayerProvider = ({ children }) => {
         
         const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
         setCurrentIndex(prevIndex);
+        
+        // Reset history flag for the new track
+        historyUpdatedRef.current = false;
         playTrack(playlist[prevIndex]);
     };
 
@@ -138,6 +191,54 @@ const PlayerProvider = ({ children }) => {
         const seconds = Math.floor(timeInSeconds % 60);
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
+    
+    // Function to add track to liked tracks
+    const addToLikedTracks = useCallback(async (track) => {
+        try {
+            await likeService.likeTrack(track.id);
+            setLikedTracks(prev => [...prev, track]);
+            return true;
+        } catch (error) {
+            console.error('Error liking track:', error);
+            return false;
+        }
+    }, []);
+    
+    // Function to remove track from liked tracks
+    const removeFromLikedTracks = useCallback(async (trackId) => {
+        try {
+            await likeService.unlikeTrack(trackId);
+            setLikedTracks(prev => prev.filter(track => track.id !== trackId));
+            return true;
+        } catch (error) {
+            console.error('Error unliking track:', error);
+            return false;
+        }
+    }, []);
+    
+    // Function to check if a track is liked
+    const isTrackLiked = useCallback((trackId) => {
+        return likedTracks.some(track => track.id === trackId);
+    }, [likedTracks]);
+    
+    // Function to add track to history
+    const addToHistory = useCallback(async (track) => {
+        try {
+            // Make sure we have a valid track with an ID
+            if (!track || !track.id) {
+                console.warn("Attempted to add an invalid track to history:", track);
+                return false;
+            }
+            
+            // Try to add to history service
+            console.log("Adding track to history:", track.name);
+            await historyService.addToHistory(track);
+            return true;
+        } catch (error) {
+            console.error('Error adding to history:', error);
+            return false;
+        }
+    }, []);
 
     return (
         <PlayerContext.Provider
@@ -148,12 +249,17 @@ const PlayerProvider = ({ children }) => {
                 currentTime,
                 playlist,
                 currentIndex,
+                likedTracks,
                 playTrack,
                 togglePlayPause,
                 playNextTrack,
                 playPreviousTrack,
                 seekTo,
-                formatTime
+                formatTime,
+                addToLikedTracks,
+                removeFromLikedTracks,
+                isTrackLiked,
+                addToHistory
             }}
         >
             {children}

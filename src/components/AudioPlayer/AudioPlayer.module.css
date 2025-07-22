@@ -73,12 +73,53 @@
     gap: 2px;
 }
 
+.trackNameContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .trackName {
     font-size: 0.8rem;
     font-weight: 500;
     color: white;
     margin: 0;
     line-height: 1;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.likeButton {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.heartIcon {
+    color: #aaa;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.heartIcon:hover {
+    color: #ff4d4d;
+    transform: scale(1.2);
+}
+
+.heartIconFilled {
+    color: #ff0000;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.heartIconFilled:hover {
+    transform: scale(1.2);
 }
 
 .artistName {

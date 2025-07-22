@@ -1,0 +1,61 @@
+.exploreRoot {
+  padding: 24px 32px;
+  background: linear-gradient(120deg, #181818 60%, #282828 100%);
+  min-height: calc(100vh - 64px); /* Subtract navbar height */
+  box-sizing: border-box;
+  /* No need for margin-left here since we're handling it in MainLayout.module.css */
+}
+
+.header {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #ff5252;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+}
+
+.loading, .error {
+  color: #fff;
+  font-size: 1.1rem;
+  margin: 32px 0;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 32px 24px;
+  margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .exploreRoot {
+    padding: 16px;
+  }
+  .header {
+    font-size: 2rem;
+  }
+  .sectionTitle {
+    font-size: 1.1rem;
+  }
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+}

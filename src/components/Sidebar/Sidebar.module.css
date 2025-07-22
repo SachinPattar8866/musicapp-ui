@@ -1,14 +1,27 @@
 .sidebar {
     width: 240px;
-    height: calc(100vh - 64px);
+    height: calc(100vh - 64px); /* 64px is navbar height */
     background-color: #030303;
     color: white;
     padding: 8px;
     overflow-y: auto;
     position: fixed;
-    top: 64px;
+    top: 64px; /* Position below the navbar */
     left: 0;
     border-right: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 50; /* Ensure sidebar is above content but below navbar */
+    box-sizing: border-box;
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%); /* Hide sidebar on mobile */
+    }
+    
+    .sidebar.open {
+        transform: translateX(0); /* Show sidebar when open class is added */
+    }
 }
 
 .nav {

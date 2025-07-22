@@ -3,6 +3,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import MainLayout from '../layout/MainLayout';
 import Home from '../pages/Home/Home.jsx';
+import Explore from '../pages/Explore/Explore.jsx';
 import Search from '../pages/Search/Search.jsx';
 import Library from '../pages/Library/Library.jsx';
 import PlaylistDetailsPage from '../pages/PlaylistDetailsPage/PlaylistDetailsPage.jsx'; // Make sure this is correctly imported
@@ -12,6 +13,7 @@ import Register from '../pages/Register/Register.jsx';
 import ProtectedRoute from '../components/ProtectedRoute/ProtectedRoute.jsx';
 import Profile from '../pages/Profile/Profile.jsx';
 import LikedSongsPage from '../pages/LikedSongsPage/LikedSongsPage.jsx'; // <-- Make sure this is imported
+import History from '../pages/History/History.jsx'; // <-- Import History component
 
 const AppRoutes = () => {
     return (
@@ -21,6 +23,7 @@ const AppRoutes = () => {
             <Route path="/register" element={<Register />} />
             <Route element={<MainLayout />}>
                 <Route path="/" element={<Home />} />
+                <Route path="/explore" element={<Explore />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/music/:id" element={<MusicDetails />} />
             </Route>
@@ -31,6 +34,7 @@ const AppRoutes = () => {
                     <Route path="/library" element={<Library />} />
                     <Route path="/playlist/:id" element={<PlaylistDetailsPage />} />
                     <Route path="/liked-songs" element={<LikedSongsPage />} />
+                    <Route path="/history" element={<History />} />
                     <Route path="/profile" element={<Profile />} />
                 </Route>
             </Route>

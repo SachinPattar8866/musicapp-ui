@@ -13,10 +13,30 @@
     margin-bottom: 3rem;
 }
 
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
 .subTitle {
     font-size: 1.25rem;
     font-weight: 600;
-    margin-bottom: 1rem;
+    margin: 0;
+}
+
+.viewAllLink {
+    color: #1DB954; /* Spotify green color */
+    font-size: 0.875rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.viewAllLink:hover {
+    color: #1ed760; /* Lighter green on hover */
+    text-decoration: underline;
 }
 
 .grid {
@@ -25,7 +45,59 @@
     gap: 1rem;
 }
 
-.emptyText {
+.emptyText, .loadingText {
     color: #9ca3af; /* Tailwind gray-400 */
     font-size: 0.95rem;
+    grid-column: 1 / -1;
+    padding: 2rem 0;
+    text-align: center;
+}
+
+.loadingText {
+    color: #d1d5db; /* Slightly lighter gray for loading */
+}
+
+/* Liked Songs Card styles */
+.likedSongsCard {
+    position: relative;
+    display: block;
+    background-color: #333;
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+    color: white;
+    aspect-ratio: 1/1;
+    transition: transform 0.3s ease;
+}
+
+.likedSongsCard:hover {
+    transform: scale(1.03);
+}
+
+.likedSongsGradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #450af5, #c4efd9);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.likedSongsContent {
+    padding: 1rem;
+}
+
+.likedSongsTitle {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+}
+
+.likedSongsCount {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
 }
