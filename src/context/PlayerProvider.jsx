@@ -1,6 +1,7 @@
 // src/context/PlayerProvider.jsx
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useContext } from 'react';
+import useAuth from '../hooks/useAuth';
 import { PlayerContext } from './PlayerContext';
 import likeService from '../services/likeService';
 import historyService from '../services/historyService';
@@ -18,9 +19,14 @@ const PlayerProvider = ({ children }) => {
     // Track if the history update has been done for current track
     const historyUpdatedRef = useRef(false);
 
-    // Fetch liked tracks
+    // Fetch liked tracks only if user is authenticated
+    const { user } = useAuth();
     useEffect(() => {
         const fetchLikedTracks = async () => {
+            if (!user) {
+                setLikedTracks([]);
+                return;
+            }
             try {
                 let tracks;
                 try {
@@ -32,7 +38,6 @@ const PlayerProvider = ({ children }) => {
                     const musicService = await import('../services/musicService');
                     tracks = await musicService.default.getLikedSongs();
                 }
-                
                 console.log('Fetched liked tracks in PlayerProvider:', tracks);
                 setLikedTracks(Array.isArray(tracks) ? tracks : []);
             } catch (error) {
@@ -40,9 +45,8 @@ const PlayerProvider = ({ children }) => {
                 setLikedTracks([]);
             }
         };
-        
         fetchLikedTracks();
-    }, []);
+    }, [user]);
     
     useEffect(() => {
         const audio = audioRef.current;
@@ -229,10 +233,10 @@ const PlayerProvider = ({ children }) => {
                 console.warn("Attempted to add an invalid track to history:", track);
                 return false;
             }
-            
-            // Try to add to history service
-            console.log("Adding track to history:", track.name);
-            await historyService.addToHistory(track);
+            // Send only the required payload
+            const payload = { trackId: track.id };
+            console.log("Adding track to history with payload:", payload);
+            await historyService.addToHistory(payload);
             return true;
         } catch (error) {
             console.error('Error adding to history:', error);
