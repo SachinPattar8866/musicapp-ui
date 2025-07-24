@@ -72,7 +72,10 @@ const Library = () => {
                     {loading ? (
                         <p className={styles.loadingText}>Loading liked songs...</p>
                     ) : likedSongs.length > 0 ? (
-                        likedSongs.slice(0, 8).map((song) => <SongCard key={song.id} song={song} />)
+                        likedSongs
+                            .filter((song) => song && typeof song === 'object' && song.id)
+                            .slice(0, 8)
+                            .map((song) => <SongCard key={song.id} song={song} />)
                     ) : (
                         <p className={styles.emptyText}>You haven't liked any songs yet.</p>
                     )}
@@ -100,13 +103,15 @@ const Library = () => {
                             </div>
                         </div>
                     </Link>
-                    
+
                     {loading ? (
                         <p className={styles.loadingText}>Loading playlists...</p>
                     ) : playlists.length > 0 ? (
-                        playlists.map((playlist) => (
-                            <PlaylistCard key={playlist.id} playlist={playlist} />
-                        ))
+                        playlists
+                            .filter((playlist) => playlist && typeof playlist === 'object' && playlist.id)
+                            .map((playlist) => (
+                                <PlaylistCard key={playlist.id} playlist={playlist} />
+                            ))
                     ) : (
                         <p className={styles.emptyText}>No playlists found.</p>
                     )}

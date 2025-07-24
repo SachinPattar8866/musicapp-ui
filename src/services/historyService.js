@@ -12,15 +12,14 @@ const historyService = {
         }
     },
 
-    addToHistory: async (track) => {
+    addToHistory: async (payload) => {
         try {
-            // Verify track has all required fields
-            if (!track || !track.id) {
-                console.error("Invalid track data:", track);
-                throw new Error("Invalid track data");
+            // Verify payload has trackId
+            if (!payload || !payload.trackId) {
+                console.error("Invalid history payload:", payload);
+                throw new Error("Invalid history payload");
             }
-            
-            const response = await api.post('/history', track);
+            const response = await api.post('/history', payload);
             return response.data;
         } catch (error) {
             console.error("Error adding to history:", error);

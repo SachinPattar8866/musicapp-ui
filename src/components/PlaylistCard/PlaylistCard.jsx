@@ -20,7 +20,7 @@ const PlaylistCard = ({ playlist }) => {
                 className="w-full h-40 object-cover rounded mb-2"
             />
             <h3 className="text-white font-semibold text-sm truncate">{playlist.name}</h3>
-            <p className="text-gray-400 text-xs">{playlist.songs.length} songs</p>
+            <p className="text-gray-400 text-xs">{Array.isArray(playlist.songs) ? playlist.songs.length : 0} songs</p>
         </div>
     );
 };
