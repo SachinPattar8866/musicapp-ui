@@ -4,7 +4,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { PlayerContext } from '../../context/PlayerContext';
 import likeService from '../../services/likeService';
 import musicService from '../../services/musicService';
-import SongCard from '../../components/songcard/SongCard';
+import SongCard from '../../components/Songcard/SongCard';
 import styles from './LikedSongsPage.module.css';
 
 const LikedSongsPage = () => {

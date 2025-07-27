@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import musicService from '../../services/musicService';
 import playlistService from '../../services/playlistService';
-import SongCard from '../../components/SongCard/SongCard';
+import SongCard from '../../components/Songcard/SongCard';
 import PlaylistCard from '../../components/PlaylistCard/PlaylistCard';
 import useAuth from '../../hooks/useAuth';
 import historyService from '../../services/historyService';

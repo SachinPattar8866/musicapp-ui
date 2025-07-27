@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { PlayerContext } from '../../context/PlayerContext';
 import historyService from '../../services/historyService';
-import SongCard from '../../components/SongCard/SongCard';
+import SongCard from '../../components/Songcard/SongCard';
 import styles from './History.module.css';
 
 const History = () => {
