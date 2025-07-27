@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import musicService from '../../services/musicService';
-import SongCard from '../../components/SongCard/SongCard';
+import SongCard from '../../components/Songcard/SongCard';
 import styles from './PlaylistDetailsPage.module.css'; // IMPORTANT: Update CSS import path
 
 const PlaylistDetailsPage = () => {

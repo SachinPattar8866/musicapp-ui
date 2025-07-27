@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom'; // <-- This is key
 import musicService from '../../services/musicService';
-import SongCard from '../../components/SongCard/SongCard';
+import SongCard from '../../components/Songcard/SongCard';
 import styles from './Search.module.css';
 
 const Search = () => {

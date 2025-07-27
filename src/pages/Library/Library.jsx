@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import musicService from '../../services/musicService';
 import likeService from '../../services/likeService';
 import PlaylistCard from '../../components/PlaylistCard/PlaylistCard';
-import SongCard from '../../components/SongCard/SongCard';
+import SongCard from '../../components/Songcard/SongCard';
 import { PlayerContext } from '../../context/PlayerContext';
 import styles from './Library.module.css';
 
