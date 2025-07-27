@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import SongCard from '../../components/songcard/SongCard';
+import SongCard from '../../components/Songcard/SongCard';
 import styles from './Explore.module.css';
 import api from '../../services/api';
 
