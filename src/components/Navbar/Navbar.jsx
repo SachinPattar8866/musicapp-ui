@@ -17,7 +17,7 @@ const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
     
     // Debug log to see user data
-    console.log('Auth user data:', user, 'isAuthenticated:', isAuthenticated);
+    console.log('[Navbar] Auth user data:', user, 'isAuthenticated:', isAuthenticated);
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
