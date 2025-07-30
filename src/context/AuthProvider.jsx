@@ -28,7 +28,9 @@ const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        setUser(getUserFromToken());
+        const userFromToken = getUserFromToken();
+        console.log('[AuthProvider] user from token:', userFromToken);
+        setUser(userFromToken);
     }, []);
 
     return (
