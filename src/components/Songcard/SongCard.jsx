@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import LoginPrompt from '../LoginPrompt/LoginPrompt';
 import { PlayerContext } from '../../context/PlayerContext';
 import styles from './SongCard.module.css';
 import { FaHeart } from 'react-icons/fa';
@@ -11,6 +12,7 @@ const defaultThumbnail = new URL('../../assets/default-thumbnail.jpg', import.me
 const SongCard = ({ song }) => {
     const { playTrack, isTrackLiked, addToLikedTracks, removeFromLikedTracks } = useContext(PlayerContext);
     const [imageError, setImageError] = useState(false);
+    const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const { isAuthenticated } = useAuth();
     const isLiked = isTrackLiked(song.id);
 
@@ -26,7 +28,7 @@ const SongCard = ({ song }) => {
         e.stopPropagation(); // Prevent card click event (play)
         
         if (!isAuthenticated) {
-            alert('Please login to like songs');
+            setShowLoginPrompt(true);
             return;
         }
         
@@ -49,37 +51,45 @@ const SongCard = ({ song }) => {
     );
 
     return (
-        <div className={styles.card} onClick={handlePlay}>
-            <div className={styles.imageContainer}>
-                <img
-                    src={imageUrl}
-                    alt={song.name}
-                    onError={handleImageError}
-                    className={styles.image}
+        <>
+            {showLoginPrompt && (
+                <LoginPrompt 
+                    message="Please log in to like songs."
+                    onClose={() => setShowLoginPrompt(false)}
                 />
-                <div className={styles.playOverlay}>
-                    <button className={styles.playButton}>
-                        <svg viewBox="0 0 24 24" className={styles.playIcon}>
-                            <path fill="currentColor" d="M8 5v14l11-7z"/>
-                        </svg>
+            )}
+            <div className={styles.card} onClick={handlePlay}>
+                <div className={styles.imageContainer}>
+                    <img
+                        src={imageUrl}
+                        alt={song.name}
+                        onError={handleImageError}
+                        className={styles.image}
+                    />
+                    <div className={styles.playOverlay}>
+                        <button className={styles.playButton}>
+                            <svg viewBox="0 0 24 24" className={styles.playIcon}>
+                                <path fill="currentColor" d="M8 5v14l11-7z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <button 
+                        className={styles.likeButton}
+                        onClick={handleToggleLike}
+                        title={isLiked ? 'Unlike' : 'Like'}
+                    >
+                        {isLiked ? 
+                            <FaHeart className={styles.heartIconFilled} /> : 
+                            <FiHeart className={styles.heartIcon} />
+                        }
                     </button>
                 </div>
-                <button 
-                    className={styles.likeButton}
-                    onClick={handleToggleLike}
-                    title={isLiked ? 'Unlike' : 'Like'}
-                >
-                    {isLiked ? 
-                        <FaHeart className={styles.heartIconFilled} /> : 
-                        <FiHeart className={styles.heartIcon} />
-                    }
-                </button>
+                <div className={styles.info}>
+                    <h3 className={styles.title}>{song.name}</h3>
+                    <p className={styles.artist}>{song.artistName}</p>
+                </div>
             </div>
-            <div className={styles.info}>
-                <h3 className={styles.title}>{song.name}</h3>
-                <p className={styles.artist}>{song.artistName}</p>
-            </div>
-        </div>
+        </>
     );
 };
 

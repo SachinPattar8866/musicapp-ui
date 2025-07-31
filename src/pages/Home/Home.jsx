@@ -1,8 +1,9 @@
+// src/pages/Home/Home.jsx
 import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import musicService from '../../services/musicService';
 import playlistService from '../../services/playlistService';
-import SongCard from '../../components/SongCard/SongCard';
+import SongCard from '../../components/Songcard/SongCard';
 import PlaylistCard from '../../components/PlaylistCard/PlaylistCard';
 import useAuth from '../../hooks/useAuth';
 import historyService from '../../services/historyService';
@@ -16,13 +17,13 @@ const Home = () => {
     const [playlists, setPlaylists] = useState([]);
     const [history, setHistory] = useState([]); // Recently played songs
     const [albums, setAlbums] = useState([]); // Placeholder for Albums For You
-    const { user } = useAuth();
+    const { user } = useAuth(); // Get user from auth context
     const { likedTracks } = useContext(PlayerContext); // Get liked tracks from context
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Fetch popular songs - limit to 8
+                // Fetch popular songs - limit to 8 (Always public)
                 const songResults = await musicService.getPopularTracks();
                 setSongs((songResults || []).slice(0, 8));
 
@@ -30,22 +31,19 @@ const Home = () => {
                 if (user) {
                     let liked = [];
                     try {
-                        // Try from likeService first
                         liked = await likeService.getLikedTracks();
                     } catch (e1) {
-                        console.log('Error fetching from likeService:', e1);
+                        console.log('Error fetching from likeService (might be unauthenticated):', e1);
                         try {
-                            // Fall back to musicService
                             liked = await musicService.getLikedSongs();
                         } catch (e2) {
-                            console.log('Error fetching from musicService:', e2);
-                            // Use context data as last resort
+                            console.log('Error fetching from musicService (might be unauthenticated):', e2);
                             liked = likedTracks || [];
                         }
                     }
-                    // Limit to 8 items
                     setLikedSongs((liked || []).slice(0, 8));
                 } else {
+                    // User is not logged in, clear liked songs
                     setLikedSongs([]);
                 }
 
@@ -54,22 +52,30 @@ const Home = () => {
                     const playlistResults = await playlistService.getUserPlaylists();
                     setPlaylists((playlistResults || []).slice(0, 4));
                 } else {
+                    // User is not logged in, clear playlists
                     setPlaylists([]);
                 }
 
-                // Fetch Listen Again (history) - limit to 8
-                let listenHistory = [];
-                try {
-                    listenHistory = await historyService.getListeningHistory();
-                } catch (e) {
-                    listenHistory = [];
+                // Fetch Listen Again (history) ONLY if user is authenticated
+                if (user) { // <--- ADDED/CONFIRMED THIS CONDITIONAL CHECK
+                    let listenHistory = [];
+                    try {
+                        listenHistory = await historyService.getListeningHistory();
+                    } catch (e) {
+                        console.error('Error fetching listening history (might be unauthenticated):', e);
+                        listenHistory = [];
+                    }
+                    setHistory(listenHistory || []);
+                } else {
+                    // User is not logged in, clear history
+                    setHistory([]);
                 }
-                setHistory(listenHistory || []);
 
-                // Placeholder: Albums For You
+                // Placeholder: Albums For You (Always public if your backend allows)
+                // If this also makes an authenticated call, it needs a similar `if (user)` block
                 setAlbums([]); // TODO: Replace with real data if available
             } catch (err) {
-                console.error('Error fetching data:', err);
+                console.error('General error fetching data in Home:', err);
             }
         };
         fetchData();
@@ -108,7 +114,9 @@ const Home = () => {
                             .filter(song => song && typeof song === 'object' && song.id)
                             .map(song => <SongCard key={song.id} song={song} />)
                     ) : (
-                        <p className={styles.emptyMessage}>No liked songs found.</p>
+                        <p className={styles.emptyMessage}>
+                            {user ? "No liked songs found." : "Log in to see your liked songs."} {/* Updated message */}
+                        </p>
                     )}
                 </div>
             </div>
@@ -133,7 +141,9 @@ const Home = () => {
                             ).values()
                         ).map(song => <SongCard key={song.id} song={song} />)
                     ) : (
-                        <p className={styles.emptyMessage}>No recent listening history.</p>
+                        <p className={styles.emptyMessage}>
+                            {user ? "No recent listening history." : "Log in to see your listening history."} {/* Updated message */}
+                        </p>
                     )}
                 </div>
             </div>
@@ -175,7 +185,9 @@ const Home = () => {
                             .filter(playlist => playlist && typeof playlist === 'object' && playlist.id)
                             .map(playlist => <PlaylistCard key={playlist.id} playlist={playlist} />)
                     ) : (
-                        <p className={styles.emptyMessage}>No playlists found. Log in to see your playlists.</p>
+                        <p className={styles.emptyMessage}>
+                            {user ? "No playlists found." : "Log in to see your playlists."} {/* Updated message */}
+                        </p>
                     )}
                 </div>
             </div>

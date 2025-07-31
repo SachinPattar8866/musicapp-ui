@@ -10,11 +10,20 @@ const api = axios.create({
     },
 });
 
-// Attach token to requests
+// Attach token only for protected endpoints
 api.interceptors.request.use((config) => {
-    // Use the getToken function from jwtUtils
-    const token = getToken(); // Correctly retrieves from 'musicapp_token'
-    if (token) {
+    // List of public endpoints (add more as needed)
+    const publicEndpoints = [
+        '/songs',
+        '/explore',
+        '/search',
+        '/music',
+        '/playlists/public',
+        // Add other public endpoints here
+    ];
+    const isPublic = publicEndpoints.some(endpoint => config.url.includes(endpoint));
+    const token = getToken();
+    if (token && !isPublic) {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -24,11 +33,20 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            // Handle unauthorized globally (logout user, etc.)
-            // Use the removeToken function from jwtUtils
-            removeToken(); // Correctly removes 'musicapp_token'
-            window.location.href = '/login'; // Redirect to login
+        // Only redirect to login for protected endpoints
+        const protectedEndpoints = [
+            '/library',
+            '/profile',
+            '/liked-songs',
+            '/history',
+            '/playlists/private',
+            // Add other protected endpoints here
+        ];
+        const url = error.config?.url || '';
+        const isProtected = protectedEndpoints.some(endpoint => url.includes(endpoint));
+        if (error.response?.status === 401 && isProtected) {
+            removeToken();
+            window.location.href = '/login';
         }
         return Promise.reject(error);
     }
