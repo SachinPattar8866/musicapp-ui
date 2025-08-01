@@ -91,11 +91,17 @@ const Home = () => {
                         View All
                     </Link>
                 </div>
-                <div className={styles.gridContainer}>
-                    {(songs || [])
-                        .filter(song => song && typeof song === 'object' && song.id)
-                        .map(song => <SongCard key={song.id} song={song} />)}
-                </div>
+            <div className={styles.gridContainer}>
+                {(songs || [])
+                .filter(song => song && typeof song === 'object' && song.id)
+                .map(song => (
+                <SongCard 
+                    key={song.id} 
+                    song={song} 
+                    onClick={() => playTrack(song, songs)} 
+                />
+            ))}
+            </div>
             </div>
 
             {/* Your Favorites */}
