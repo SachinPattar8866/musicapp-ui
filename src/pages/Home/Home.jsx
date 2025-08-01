@@ -18,7 +18,7 @@ const Home = () => {
     const [history, setHistory] = useState([]); // Recently played songs
     const [albums, setAlbums] = useState([]); // Placeholder for Albums For You
     const { user } = useAuth(); // Get user from auth context
-    const { likedTracks } = useContext(PlayerContext); // Get liked tracks from context
+    const { likedTracks, playTrack } = useContext(PlayerContext); // Get liked tracks and playTrack from context
 
     useEffect(() => {
         const fetchData = async () => {
