@@ -1,24 +1,23 @@
+// src/components/Songcard/SongCard.jsx (Updated)
+
 import React, { useContext, useState } from 'react';
-import LoginPrompt from '../LoginPrompt/LoginPrompt';
 import { PlayerContext } from '../../context/PlayerContext';
+import useAuth from '../../hooks/useAuth';
+import LoginPrompt from '../LoginPrompt/LoginPrompt';
 import styles from './SongCard.module.css';
 import { FaHeart } from 'react-icons/fa';
 import { FiHeart } from 'react-icons/fi';
-import useAuth from '../../hooks/useAuth';
 
 // Import the default thumbnail image
 const defaultThumbnail = new URL('../../assets/default-thumbnail.jpg', import.meta.url).href;
 
-const SongCard = ({ song }) => {
-    const { playTrack, isTrackLiked, addToLikedTracks, removeFromLikedTracks } = useContext(PlayerContext);
+// The component now accepts an `onClick` handler from its parent
+const SongCard = ({ song, onClick }) => {
+    const { isTrackLiked, addToLikedTracks, removeFromLikedTracks } = useContext(PlayerContext);
     const [imageError, setImageError] = useState(false);
     const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const { isAuthenticated } = useAuth();
     const isLiked = isTrackLiked(song.id);
-
-    const handlePlay = () => {
-        playTrack(song);
-    };
 
     const handleImageError = () => {
         setImageError(true);
@@ -43,7 +42,6 @@ const SongCard = ({ song }) => {
         }
     };
 
-    // Use the image URL directly if it's a complete URL, otherwise use the default thumbnail
     const imageUrl = imageError ? defaultThumbnail : (
         song.coverImage?.startsWith('http')
             ? song.coverImage
@@ -58,7 +56,8 @@ const SongCard = ({ song }) => {
                     onClose={() => setShowLoginPrompt(false)}
                 />
             )}
-            <div className={styles.card} onClick={handlePlay}>
+            {/* The main card div now uses the onClick prop provided by its parent */}
+            <div className={styles.card} onClick={onClick}>
                 <div className={styles.imageContainer}>
                     <img
                         src={imageUrl}
