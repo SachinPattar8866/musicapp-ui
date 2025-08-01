@@ -118,7 +118,13 @@ const Home = () => {
                     {(likedSongs || []).filter(song => song && typeof song === 'object' && song.id).length > 0 ? (
                         (likedSongs || [])
                             .filter(song => song && typeof song === 'object' && song.id)
-                            .map(song => <SongCard key={song.id} song={song} />)
+                            .map(song => (
+                                <SongCard
+                                    key={song.id}
+                                    song={song}
+                                    onClick={() => playTrack(song, likedSongs)}
+                                />
+                            ))
                     ) : (
                         <p className={styles.emptyMessage}>
                             {user ? "No liked songs found." : "Log in to see your liked songs."} {/* Updated message */}
@@ -145,7 +151,15 @@ const Home = () => {
                                     .filter(song => song && typeof song === 'object' && song.id)
                                     .map(song => [song.id, song])
                             ).values()
-                        ).map(song => <SongCard key={song.id} song={song} />)
+                        )
+                        
+                        .map(song => (
+                            <SongCard
+                                key={song.id}
+                                song={song}
+                                onClick={() => playTrack(song, history)}
+                            />
+                        ))
                     ) : (
                         <p className={styles.emptyMessage}>
                             {user ? "No recent listening history." : "Log in to see your listening history."} {/* Updated message */}
