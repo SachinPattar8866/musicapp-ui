@@ -44,7 +44,12 @@ const History = () => {
                             .map(song => [song.id, song])
                     ).values()
                 ).map((song) => (
-                    <SongCard key={song.id} song={song} />
+                    <SongCard
+                        key={song.id}
+                        song={song}
+                        // ADDED: onClick handler to play the song from history
+                        onClick={() => playTrack(song, listeningHistory)} 
+                    />
                 ))}
             </div>
         </div>
