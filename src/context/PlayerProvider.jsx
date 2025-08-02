@@ -15,13 +15,9 @@ const PlayerProvider = ({ children }) => {
     const [currentIndex, setCurrentIndex] = useState(-1);
     const [likedTracks, setLikedTracks] = useState([]);
     const audioRef = useRef(new Audio());
-    
-    // No longer needed after refactoring the useEffect hook
-    // const historyUpdatedRef = useRef(false);
-    
+
     const { user } = useAuth();
-    
-    // ... (rest of the code for fetching liked tracks remains the same) ...
+
     useEffect(() => {
         const fetchLikedTracks = async () => {
             if (!user) {
@@ -67,78 +63,14 @@ const PlayerProvider = ({ children }) => {
         }
     }, [user]);
 
-    // Use two separate useEffect hooks for better control
-    useEffect(() => {
-        const audio = audioRef.current;
-        const handleEnded = () => playNextTrack();
-
-        audio.addEventListener('ended', handleEnded);
-
-        return () => {
-            audio.removeEventListener('ended', handleEnded);
-        };
-    }, [playNextTrack]);
-
-    useEffect(() => {
-        const audio = audioRef.current;
-        let lastPlayedTime = currentTime;
-
-        const handleTimeUpdate = () => {
-            setCurrentTime(audio.currentTime);
-            lastPlayedTime = audio.currentTime;
-            const progress = (audio.currentTime / audio.duration) * 100;
-            document.documentElement.style.setProperty('--progress', `${progress}%`);
-        };
-        
-        const handleLoadedMetadata = () => {
-            setDuration(audio.duration);
-            if (lastPlayedTime > 0) {
-                audio.currentTime = lastPlayedTime;
-            } else {
-                setCurrentTime(0);
-            }
-            document.documentElement.style.setProperty('--progress', `${(lastPlayedTime / audio.duration) * 100}%`);
-        };
-        
-        const handlePause = () => {
-            lastPlayedTime = audio.currentTime;
-        };
-        
-        audio.addEventListener('timeupdate', handleTimeUpdate);
-        audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-        audio.addEventListener('pause', handlePause);
-
-        if (currentTrack) {
-            // Check if the track has changed before updating the source
-            if (audio.src !== currentTrack.audioUrl) {
-                audio.src = currentTrack.audioUrl;
-                audio.load();
-                // We moved addToHistory to playTrack function for better control
-            }
-            
-            if (isPlaying) {
-                audio.play().catch(e => console.error("Audio playback failed:", e));
-            } else {
-                audio.pause();
-            }
-        } else {
-            audio.pause();
-            audio.src = "";
-        }
-
-        return () => {
-            audio.removeEventListener('timeupdate', handleTimeUpdate);
-            audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-            audio.removeEventListener('pause', handlePause);
-        };
-    }, [currentTrack, isPlaying, currentTime]); // Dependencies for this effect
-
-    const playTrack = (track, trackList = []) => {
+    // This is the core playback function, memoized with useCallback
+    const playTrack = useCallback((track, trackList = []) => {
+        // Prevent playing tracks without a valid audio source
         if (!track || !track.audioUrl) {
             console.warn("Attempted to play a track without an audio source:", track);
             return;
         }
-        
+
         // If the new track is the same as the current one, just toggle play/pause
         if (currentTrack && currentTrack.id === track.id) {
             togglePlayPause();
@@ -155,20 +87,15 @@ const PlayerProvider = ({ children }) => {
             newPlaylist = [track];
             newIndex = 0;
         }
-        
-        // Update playlist state if it has changed
-        if (newPlaylist !== playlist) {
-            setPlaylist(newPlaylist);
-        }
-        if (newIndex !== currentIndex) {
-            setCurrentIndex(newIndex);
-        }
+
+        setPlaylist(newPlaylist);
+        setCurrentIndex(newIndex);
         
         // This is the correct place to call addToHistory - only when a new track is selected
         addToHistory(track);
         setCurrentTrack(track);
         setIsPlaying(true);
-    };
+    }, [currentTrack, addToHistory]);
 
     const togglePlayPause = () => {
         setIsPlaying(!isPlaying);
@@ -191,6 +118,64 @@ const PlayerProvider = ({ children }) => {
         const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
         playTrack(playlist[prevIndex], playlist); // Pass the playlist to playTrack
     }, [currentIndex, playlist, playTrack]);
+
+    // Use two separate useEffect hooks for better control and to avoid a re-render loop
+    // Effect 1: Handle audio events like 'ended'
+    useEffect(() => {
+        const audio = audioRef.current;
+        const handleEnded = () => playNextTrack();
+        audio.addEventListener('ended', handleEnded);
+
+        return () => {
+            audio.removeEventListener('ended', handleEnded);
+        };
+    }, [playNextTrack]);
+
+    // Effect 2: Handle playback state and source changes
+    useEffect(() => {
+        const audio = audioRef.current;
+        let lastPlayedTime = currentTime;
+
+        const handleTimeUpdate = () => {
+            setCurrentTime(audio.currentTime);
+            const progress = (audio.currentTime / audio.duration) * 100;
+            document.documentElement.style.setProperty('--progress', `${progress}%`);
+        };
+        
+        const handleLoadedMetadata = () => {
+            setDuration(audio.duration);
+            if (lastPlayedTime > 0) {
+                audio.currentTime = lastPlayedTime;
+            } else {
+                setCurrentTime(0);
+            }
+            document.documentElement.style.setProperty('--progress', `${(lastPlayedTime / audio.duration) * 100}%`);
+        };
+        
+        audio.addEventListener('timeupdate', handleTimeUpdate);
+        audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+        
+        if (currentTrack) {
+            if (audio.src !== currentTrack.audioUrl) {
+                audio.src = currentTrack.audioUrl;
+                audio.load();
+            }
+            
+            if (isPlaying) {
+                audio.play().catch(e => console.error("Audio playback failed:", e));
+            } else {
+                audio.pause();
+            }
+        } else {
+            audio.pause();
+            audio.src = "";
+        }
+
+        return () => {
+            audio.removeEventListener('timeupdate', handleTimeUpdate);
+            audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        };
+    }, [currentTrack, isPlaying]); // The dependencies are now optimized
 
     const seekTo = (time) => {
         const audio = audioRef.current;
