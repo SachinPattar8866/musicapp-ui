@@ -63,15 +63,12 @@ const PlayerProvider = ({ children }) => {
         }
     }, [user]);
 
-    // This is the core playback function, memoized with useCallback
     const playTrack = useCallback((track, trackList = []) => {
-        // Prevent playing tracks without a valid audio source
         if (!track || !track.audioUrl) {
             console.warn("Attempted to play a track without an audio source:", track);
             return;
         }
 
-        // If the new track is the same as the current one, just toggle play/pause
         if (currentTrack && currentTrack.id === track.id) {
             togglePlayPause();
             return;
@@ -91,10 +88,11 @@ const PlayerProvider = ({ children }) => {
         setPlaylist(newPlaylist);
         setCurrentIndex(newIndex);
         
-        // This is the correct place to call addToHistory - only when a new track is selected
         addToHistory(track);
         setCurrentTrack(track);
         setIsPlaying(true);
+        // NEW: Reset currentTime to 0 whenever a new track is played
+        setCurrentTime(0);
     }, [currentTrack, addToHistory]);
 
     const togglePlayPause = () => {
@@ -107,7 +105,7 @@ const PlayerProvider = ({ children }) => {
             return;
         }
         const nextIndex = (currentIndex + 1) % playlist.length;
-        playTrack(playlist[nextIndex], playlist); // Pass the playlist to playTrack
+        playTrack(playlist[nextIndex], playlist);
     }, [currentIndex, playlist, playTrack]);
 
     const playPreviousTrack = useCallback(() => {
@@ -116,11 +114,9 @@ const PlayerProvider = ({ children }) => {
             return;
         }
         const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-        playTrack(playlist[prevIndex], playlist); // Pass the playlist to playTrack
+        playTrack(playlist[prevIndex], playlist);
     }, [currentIndex, playlist, playTrack]);
 
-    // Use two separate useEffect hooks for better control and to avoid a re-render loop
-    // Effect 1: Handle audio events like 'ended'
     useEffect(() => {
         const audio = audioRef.current;
         const handleEnded = () => playNextTrack();
@@ -131,10 +127,8 @@ const PlayerProvider = ({ children }) => {
         };
     }, [playNextTrack]);
 
-    // Effect 2: Handle playback state and source changes
     useEffect(() => {
         const audio = audioRef.current;
-        let lastPlayedTime = currentTime;
 
         const handleTimeUpdate = () => {
             setCurrentTime(audio.currentTime);
@@ -144,12 +138,10 @@ const PlayerProvider = ({ children }) => {
         
         const handleLoadedMetadata = () => {
             setDuration(audio.duration);
-            if (lastPlayedTime > 0) {
-                audio.currentTime = lastPlayedTime;
-            } else {
-                setCurrentTime(0);
-            }
-            document.documentElement.style.setProperty('--progress', `${(lastPlayedTime / audio.duration) * 100}%`);
+            // NEW: Reset audio.currentTime to 0 when new metadata is loaded
+            audio.currentTime = 0;
+            setCurrentTime(0);
+            document.documentElement.style.setProperty('--progress', '0%');
         };
         
         audio.addEventListener('timeupdate', handleTimeUpdate);
@@ -175,7 +167,7 @@ const PlayerProvider = ({ children }) => {
             audio.removeEventListener('timeupdate', handleTimeUpdate);
             audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
         };
-    }, [currentTrack, isPlaying]); // The dependencies are now optimized
+    }, [currentTrack, isPlaying]);
 
     const seekTo = (time) => {
         const audio = audioRef.current;
