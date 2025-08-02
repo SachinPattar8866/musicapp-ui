@@ -137,45 +137,46 @@ const PlayerProvider = ({ children }) => {
         };
     }, [currentTrack, isPlaying, addToHistory]);
 
-    // MODIFIED: playTrack function to handle playlist state correctly
-    const playTrack = (track, trackList = []) => {
-        if (!track || !track.audioUrl) {
-            console.warn("Attempted to play a track without an audio source:", track);
-            return;
-        }
+        const playTrack = (track, trackList = []) => {
+            if (!track || !track.audioUrl) {
+                console.warn("Attempted to play a track without an audio source:", track);
+                return;
+            }
 
-        // --- THE KEY CHANGE IS HERE ---
-        let newPlaylist = [];
-        let newIndex = -1;
+    // If the new track is the same as the current one, just toggle play/pause
+            if (currentTrack && currentTrack.id === track.id) {
+                togglePlayPause();
+                return;
+            }
 
-        if (trackList.length > 0) {
-            newPlaylist = trackList;
-            newIndex = newPlaylist.findIndex(t => t.id === track.id);
-        } else {
-            // If no track list is provided, create a playlist with just the current track.
-            // This ensures playlist.length is never 0 and next/previous logic doesn't fail.
-            newPlaylist = [track];
-            newIndex = 0;
-        }
+    // --- THE KEY CHANGE IS HERE ---
+            let newPlaylist = [];
+            let newIndex = -1;
 
-        // Only update state if there's a change
-        if (newPlaylist !== playlist) {
-            setPlaylist(newPlaylist);
-        }
-        if (newIndex !== currentIndex) {
-            setCurrentIndex(newIndex);
-        }
-        // --- END KEY CHANGE ---
+            if (trackList.length > 0) {
+                newPlaylist = trackList;
+                newIndex = newPlaylist.findIndex(t => t.id === track.id);
+            } else {
+        // If no track list is provided, create a playlist with just the current track.
+                newPlaylist = [track];
+                newIndex = 0;
+            }
 
-        // Debugging logs to see what the state is
-        console.log("PlayTrack called. New Playlist:", newPlaylist);
-        console.log("Current Index:", newIndex);
+    // Update state only if there's a change to prevent unnecessary re-renders
+            if (newPlaylist !== playlist) {
+                setPlaylist(newPlaylist);
+            }
+            if (newIndex !== currentIndex) {
+                setCurrentIndex(newIndex);
+            }
+    // --- END KEY CHANGE ---
 
-        addToHistory(track);
-        setCurrentTrack(track);
-        setIsPlaying(true);
-        historyUpdatedRef.current = false;
-    };
+    // The following lines were not being executed correctly
+            addToHistory(track);
+            setCurrentTrack(track);
+            setIsPlaying(true);
+            historyUpdatedRef.current = false;
+        };
 
     const togglePlayPause = () => {
         setIsPlaying(!isPlaying);
