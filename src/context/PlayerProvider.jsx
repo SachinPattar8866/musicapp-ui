@@ -16,7 +16,9 @@ const PlayerProvider = ({ children }) => {
     const [likedTracks, setLikedTracks] = useState([]);
     const audioRef = useRef(new Audio());
     
-    const historyUpdatedRef = useRef(false);
+    // No longer needed after refactoring the useEffect hook
+    // const historyUpdatedRef = useRef(false);
+    
     const { user } = useAuth();
     
     // ... (rest of the code for fetching liked tracks remains the same) ...
@@ -65,6 +67,18 @@ const PlayerProvider = ({ children }) => {
         }
     }, [user]);
 
+    // Use two separate useEffect hooks for better control
+    useEffect(() => {
+        const audio = audioRef.current;
+        const handleEnded = () => playNextTrack();
+
+        audio.addEventListener('ended', handleEnded);
+
+        return () => {
+            audio.removeEventListener('ended', handleEnded);
+        };
+    }, [playNextTrack]);
+
     useEffect(() => {
         const audio = audioRef.current;
         let lastPlayedTime = currentTime;
@@ -74,11 +88,6 @@ const PlayerProvider = ({ children }) => {
             lastPlayedTime = audio.currentTime;
             const progress = (audio.currentTime / audio.duration) * 100;
             document.documentElement.style.setProperty('--progress', `${progress}%`);
-            
-            if (audio.currentTime > 0 && !historyUpdatedRef.current && currentTrack) {
-                addToHistory(currentTrack);
-                historyUpdatedRef.current = true;
-            }
         };
         
         const handleLoadedMetadata = () => {
@@ -91,32 +100,22 @@ const PlayerProvider = ({ children }) => {
             document.documentElement.style.setProperty('--progress', `${(lastPlayedTime / audio.duration) * 100}%`);
         };
         
-        const handleEnded = () => {
-            document.documentElement.style.setProperty('--progress', '0%');
-            setCurrentTime(0);
-            lastPlayedTime = 0;
-            playNextTrack();
-        };
-
         const handlePause = () => {
             lastPlayedTime = audio.currentTime;
         };
-
+        
         audio.addEventListener('timeupdate', handleTimeUpdate);
         audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-        audio.addEventListener('ended', handleEnded);
         audio.addEventListener('pause', handlePause);
 
         if (currentTrack) {
+            // Check if the track has changed before updating the source
             if (audio.src !== currentTrack.audioUrl) {
-                const previousTime = lastPlayedTime;
                 audio.src = currentTrack.audioUrl;
                 audio.load();
-                lastPlayedTime = previousTime;
-                historyUpdatedRef.current = false;
-                addToHistory(currentTrack);
+                // We moved addToHistory to playTrack function for better control
             }
-
+            
             if (isPlaying) {
                 audio.play().catch(e => console.error("Audio playback failed:", e));
             } else {
@@ -130,85 +129,68 @@ const PlayerProvider = ({ children }) => {
         return () => {
             audio.removeEventListener('timeupdate', handleTimeUpdate);
             audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-            audio.removeEventListener('ended', handleEnded);
             audio.removeEventListener('pause', handlePause);
-            audio.pause();
-            audio.src = "";
         };
-    }, [currentTrack, isPlaying, addToHistory]);
+    }, [currentTrack, isPlaying, currentTime]); // Dependencies for this effect
 
-        const playTrack = (track, trackList = []) => {
-            if (!track || !track.audioUrl) {
-                console.warn("Attempted to play a track without an audio source:", track);
-                return;
-            }
+    const playTrack = (track, trackList = []) => {
+        if (!track || !track.audioUrl) {
+            console.warn("Attempted to play a track without an audio source:", track);
+            return;
+        }
+        
+        // If the new track is the same as the current one, just toggle play/pause
+        if (currentTrack && currentTrack.id === track.id) {
+            togglePlayPause();
+            return;
+        }
 
-    // If the new track is the same as the current one, just toggle play/pause
-            if (currentTrack && currentTrack.id === track.id) {
-                togglePlayPause();
-                return;
-            }
+        let newPlaylist = [];
+        let newIndex = -1;
 
-    // --- THE KEY CHANGE IS HERE ---
-            let newPlaylist = [];
-            let newIndex = -1;
-
-            if (trackList.length > 0) {
-                newPlaylist = trackList;
-                newIndex = newPlaylist.findIndex(t => t.id === track.id);
-            } else {
-        // If no track list is provided, create a playlist with just the current track.
-                newPlaylist = [track];
-                newIndex = 0;
-            }
-
-    // Update state only if there's a change to prevent unnecessary re-renders
-            if (newPlaylist !== playlist) {
-                setPlaylist(newPlaylist);
-            }
-            if (newIndex !== currentIndex) {
-                setCurrentIndex(newIndex);
-            }
-    // --- END KEY CHANGE ---
-
-    // The following lines were not being executed correctly
-            addToHistory(track);
-            setCurrentTrack(track);
-            setIsPlaying(true);
-            historyUpdatedRef.current = false;
-        };
+        if (trackList.length > 0) {
+            newPlaylist = trackList;
+            newIndex = newPlaylist.findIndex(t => t.id === track.id);
+        } else {
+            newPlaylist = [track];
+            newIndex = 0;
+        }
+        
+        // Update playlist state if it has changed
+        if (newPlaylist !== playlist) {
+            setPlaylist(newPlaylist);
+        }
+        if (newIndex !== currentIndex) {
+            setCurrentIndex(newIndex);
+        }
+        
+        // This is the correct place to call addToHistory - only when a new track is selected
+        addToHistory(track);
+        setCurrentTrack(track);
+        setIsPlaying(true);
+    };
 
     const togglePlayPause = () => {
         setIsPlaying(!isPlaying);
     };
 
-    const playNextTrack = () => {
+    const playNextTrack = useCallback(() => {
         if (playlist.length === 0) {
             console.log("Cannot play next track: playlist is empty.");
             return;
         }
-        console.log("Playing next track. Current Index:", currentIndex, "Playlist Length:", playlist.length);
-        
         const nextIndex = (currentIndex + 1) % playlist.length;
-        setCurrentIndex(nextIndex);
-        
-        historyUpdatedRef.current = false;
-        playTrack(playlist[nextIndex]);
-    };
+        playTrack(playlist[nextIndex], playlist); // Pass the playlist to playTrack
+    }, [currentIndex, playlist, playTrack]);
 
-    const playPreviousTrack = () => {
+    const playPreviousTrack = useCallback(() => {
         if (playlist.length === 0) {
             console.log("Cannot play previous track: playlist is empty.");
             return;
         }
-        console.log("Playing previous track. Current Index:", currentIndex, "Playlist Length:", playlist.length);
-        
         const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-        setCurrentIndex(prevIndex);
-        
-        historyUpdatedRef.current = false;
-        playTrack(playlist[prevIndex]);
-    };
+        playTrack(playlist[prevIndex], playlist); // Pass the playlist to playTrack
+    }, [currentIndex, playlist, playTrack]);
 
     const seekTo = (time) => {
         const audio = audioRef.current;
@@ -216,8 +198,6 @@ const PlayerProvider = ({ children }) => {
             if (time >= 0 && time <= audio.duration) {
                 audio.currentTime = time;
                 setCurrentTime(time);
-                const progress = (time / audio.duration) * 100;
-                document.documentElement.style.setProperty('--progress', `${progress}%`);
             }
         }
     };

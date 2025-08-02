@@ -1,50 +1,24 @@
+// src/pages/Library/Library.jsx
+
 import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import musicService from '../../services/musicService';
-import likeService from '../../services/likeService';
 import PlaylistCard from '../../components/PlaylistCard/PlaylistCard';
 import SongCard from '../../components/Songcard/SongCard';
 import { PlayerContext } from '../../context/PlayerContext';
 import styles from './Library.module.css';
 
 const Library = () => {
-    const [likedSongs, setLikedSongs] = useState([]);
+    // UPDATED: Using likedTracks and playTrack directly from context
+    const { likedTracks, playTrack } = useContext(PlayerContext);
     const [playlists, setPlaylists] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const { likedTracks } = useContext(PlayerContext);
-
+    const [loading, setLoading] = useState(true); // Still need this for playlists
+    
+    // UPDATED: Removed fetchLikedSongs since context handles it
     useEffect(() => {
-        fetchLikedSongs();
         fetchUserPlaylists();
-    }, [likedTracks]); // Re-fetch when likedTracks changes in context
-
-    const fetchLikedSongs = async () => {
-        try {
-            setLoading(true);
-            // Try multiple sources for liked songs
-            let songs;
-            try {
-                // First try likeService
-                songs = await likeService.getLikedTracks();
-            } catch (likeError) {
-                console.log('Error with likeService, trying musicService:', likeError);
-                try {
-                    // Then try musicService
-                    songs = await musicService.getLikedSongs();
-                } catch (musicError) {
-                    console.log('Error with musicService, using context:', musicError);
-                    // Fall back to context data
-                    songs = likedTracks || [];
-                }
-            }
-            setLikedSongs(Array.isArray(songs) ? songs : []);
-        } catch (error) {
-            console.error('Failed to fetch liked songs:', error);
-            setLikedSongs([]);
-        } finally {
-            setLoading(false);
-        }
-    };
+        setLoading(false); // Set loading to false once playlists are handled
+    }, []);
 
     const fetchUserPlaylists = async () => {
         try {
@@ -62,20 +36,25 @@ const Library = () => {
             <div className={styles.subsection}>
                 <div className={styles.sectionHeader}>
                     <h3 className={styles.subTitle}>Recently Liked</h3>
-                    {likedSongs.length > 0 && (
+                    {likedTracks.length > 0 && (
                         <Link to="/liked-songs" className={styles.viewAllLink}>
                             View All
                         </Link>
                     )}
                 </div>
                 <div className={styles.grid}>
-                    {loading ? (
-                        <p className={styles.loadingText}>Loading liked songs...</p>
-                    ) : likedSongs.length > 0 ? (
-                        likedSongs
+                    {likedTracks.length > 0 ? (
+                        likedTracks
                             .filter((song) => song && typeof song === 'object' && song.id)
                             .slice(0, 8)
-                            .map((song) => <SongCard key={song.id} song={song} />)
+                            .map((song) => (
+                                <SongCard 
+                                    key={song.id} 
+                                    song={song} 
+                                    // ADDED: onClick handler
+                                    onClick={() => playTrack(song, likedTracks)}
+                                />
+                            ))
                     ) : (
                         <p className={styles.emptyText}>You haven't liked any songs yet.</p>
                     )}
@@ -92,21 +71,18 @@ const Library = () => {
                     )}
                 </div>
                 <div className={styles.grid}>
-                    {/* Special Liked Songs Card */}
                     <Link to="/liked-songs" className={styles.likedSongsCard}>
                         <div className={styles.likedSongsGradient}>
                             <div className={styles.likedSongsContent}>
                                 <h4 className={styles.likedSongsTitle}>Liked Songs</h4>
                                 <p className={styles.likedSongsCount}>
-                                    {likedSongs.length} songs
+                                    {likedTracks.length} songs
                                 </p>
                             </div>
                         </div>
                     </Link>
 
-                    {loading ? (
-                        <p className={styles.loadingText}>Loading playlists...</p>
-                    ) : playlists.length > 0 ? (
+                    {playlists.length > 0 ? (
                         playlists
                             .filter((playlist) => playlist && typeof playlist === 'object' && playlist.id)
                             .map((playlist) => (
