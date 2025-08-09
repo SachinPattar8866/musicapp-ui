@@ -57,15 +57,29 @@ const Home = () => {
                 }
 
                 // Fetch Listen Again (history) ONLY if user is authenticated
-                if (user) { // <--- ADDED/CONFIRMED THIS CONDITIONAL CHECK
+                if (user) {
                     let listenHistory = [];
                     try {
                         listenHistory = await historyService.getListeningHistory();
+                        // Fetch full song details for each history record
+                        const songs = await Promise.all(
+                            (listenHistory || []).map(async (record) => {
+                                if (record.trackId) {
+                                    try {
+                                        const song = await import('../../services/musicService').then(ms => ms.default.getTrackDetails(record.trackId));
+                                        return song;
+                                    } catch (e) {
+                                        return null;
+                                    }
+                                }
+                                return null;
+                            })
+                        );
+                        setHistory(songs.filter(Boolean));
                     } catch (e) {
                         console.error('Error fetching listening history (might be unauthenticated):', e);
-                        listenHistory = [];
+                        setHistory([]);
                     }
-                    setHistory(listenHistory || []);
                 } else {
                     // User is not logged in, clear history
                     setHistory([]);

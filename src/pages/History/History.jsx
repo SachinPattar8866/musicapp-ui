@@ -17,7 +17,21 @@ const History = () => {
             try {
                 setLoading(true);
                 const history = await historyService.getListeningHistory();
-                setListeningHistory(history || []);
+                // Fetch full song details for each history record
+                const songs = await Promise.all(
+                    (history || []).map(async (record) => {
+                        if (record.trackId) {
+                            try {
+                                const song = await import('../../services/musicService').then(ms => ms.default.getTrackDetails(record.trackId));
+                                return song;
+                            } catch (e) {
+                                return null;
+                            }
+                        }
+                        return null;
+                    })
+                );
+                setListeningHistory(songs.filter(Boolean));
             } catch (err) {
                 console.error('Error fetching listening history:', err);
                 setError('Failed to load listening history. Please try again.');
