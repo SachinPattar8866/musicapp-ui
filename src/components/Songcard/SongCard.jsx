@@ -12,7 +12,7 @@ import { FiHeart } from 'react-icons/fi';
 const defaultThumbnail = new URL('../../assets/default-thumbnail.jpg', import.meta.url).href;
 
 // The component now accepts an `onClick` handler from its parent
-const SongCard = ({ song, onClick, onLikeAttempt }) => {
+const SongCard = ({ song, onClick }) => {
     const { isTrackLiked, addToLikedTracks, removeFromLikedTracks } = useContext(PlayerContext);
     const [imageError, setImageError] = useState(false);
     const { isAuthenticated } = useAuth();
@@ -25,7 +25,7 @@ const SongCard = ({ song, onClick, onLikeAttempt }) => {
     const handleToggleLike = async (e) => {
         e.stopPropagation(); // Prevent card click event (play)
         if (!isAuthenticated) {
-            if (onLikeAttempt) onLikeAttempt();
+            window.alert("Please log in to like songs.");
             return;
         }
         try {

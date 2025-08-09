@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import SongCard from '../../components/Songcard/SongCard';
-import LoginPrompt from '../../components/LoginPrompt/LoginPrompt';
 import styles from './Explore.module.css';
 import api from '../../services/api';
 
@@ -8,7 +7,6 @@ const Explore = () => {
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   useEffect(() => {
     const fetchPopular = async () => {
@@ -28,9 +26,6 @@ const Explore = () => {
     fetchPopular();
   }, []);
 
-  const handleLikeAttempt = () => {
-    setShowLoginPrompt(true);
-  };
 
   return (
     <div className={styles.exploreRoot}>
@@ -38,15 +33,9 @@ const Explore = () => {
       <h2 className={styles.sectionTitle}>Trending Now</h2>
       {loading && <div className={styles.loading}>Loading...</div>}
       {error && <div className={styles.error}>{error}</div>}
-      {showLoginPrompt && (
-        <LoginPrompt 
-          message="Please log in to like songs."
-          onClose={() => setShowLoginPrompt(false)}
-        />
-      )}
       <div className={styles.grid}>
         {songs.map(song => (
-          <SongCard key={song.id} song={song} onLikeAttempt={handleLikeAttempt} />
+          <SongCard key={song.id} song={song} />
         ))}
       </div>
     </div>
