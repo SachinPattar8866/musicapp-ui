@@ -12,10 +12,9 @@ import { FiHeart } from 'react-icons/fi';
 const defaultThumbnail = new URL('../../assets/default-thumbnail.jpg', import.meta.url).href;
 
 // The component now accepts an `onClick` handler from its parent
-const SongCard = ({ song, onClick }) => {
+const SongCard = ({ song, onClick, onLikeAttempt }) => {
     const { isTrackLiked, addToLikedTracks, removeFromLikedTracks } = useContext(PlayerContext);
     const [imageError, setImageError] = useState(false);
-    const [showLoginPrompt, setShowLoginPrompt] = useState(false);
     const { isAuthenticated } = useAuth();
     const isLiked = isTrackLiked(song.id);
 
@@ -25,12 +24,10 @@ const SongCard = ({ song, onClick }) => {
 
     const handleToggleLike = async (e) => {
         e.stopPropagation(); // Prevent card click event (play)
-        
         if (!isAuthenticated) {
-            setShowLoginPrompt(true);
+            if (onLikeAttempt) onLikeAttempt();
             return;
         }
-        
         try {
             if (isLiked) {
                 await removeFromLikedTracks(song.id);
@@ -49,46 +46,37 @@ const SongCard = ({ song, onClick }) => {
     );
 
     return (
-        <>
-            {showLoginPrompt && (
-                <LoginPrompt 
-                    message="Please log in to like songs."
-                    onClose={() => setShowLoginPrompt(false)}
+        <div className={styles.card} onClick={onClick}>
+            <div className={styles.imageContainer}>
+                <img
+                    src={imageUrl}
+                    alt={song.name}
+                    onError={handleImageError}
+                    className={styles.image}
                 />
-            )}
-            {/* The main card div now uses the onClick prop provided by its parent */}
-            <div className={styles.card} onClick={onClick}>
-                <div className={styles.imageContainer}>
-                    <img
-                        src={imageUrl}
-                        alt={song.name}
-                        onError={handleImageError}
-                        className={styles.image}
-                    />
-                    <div className={styles.playOverlay}>
-                        <button className={styles.playButton}>
-                            <svg viewBox="0 0 24 24" className={styles.playIcon}>
-                                <path fill="currentColor" d="M8 5v14l11-7z"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <button 
-                        className={styles.likeButton}
-                        onClick={handleToggleLike}
-                        title={isLiked ? 'Unlike' : 'Like'}
-                    >
-                        {isLiked ? 
-                            <FaHeart className={styles.heartIconFilled} /> : 
-                            <FiHeart className={styles.heartIcon} />
-                        }
+                <div className={styles.playOverlay}>
+                    <button className={styles.playButton}>
+                        <svg viewBox="0 0 24 24" className={styles.playIcon}>
+                            <path fill="currentColor" d="M8 5v14l11-7z"/>
+                        </svg>
                     </button>
                 </div>
-                <div className={styles.info}>
-                    <h3 className={styles.title}>{song.name}</h3>
-                    <p className={styles.artist}>{song.artistName}</p>
-                </div>
+                <button 
+                    className={styles.likeButton}
+                    onClick={handleToggleLike}
+                    title={isLiked ? 'Unlike' : 'Like'}
+                >
+                    {isLiked ? 
+                        <FaHeart className={styles.heartIconFilled} /> : 
+                        <FiHeart className={styles.heartIcon} />
+                    }
+                </button>
             </div>
-        </>
+            <div className={styles.info}>
+                <h3 className={styles.title}>{song.name}</h3>
+                <p className={styles.artist}>{song.artistName}</p>
+            </div>
+        </div>
     );
 };
 
