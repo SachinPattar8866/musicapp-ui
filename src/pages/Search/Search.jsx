@@ -4,9 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom'; // <-- This is key
 import musicService from '../../services/musicService';
 import SongCard from '../../components/Songcard/SongCard';
+import { useContext } from 'react';
+import { PlayerContext } from '../../context/PlayerContext';
 import styles from './Search.module.css';
 
 const Search = () => {
+    const { playTrack } = useContext(PlayerContext);
     const [searchParams] = useSearchParams(); // Remove setSearchParams
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -59,7 +62,7 @@ const Search = () => {
 
             <div className={styles.resultsGrid}>
                 {searchResults.map((song) => (
-                    <SongCard key={song.id} song={song} />
+                    <SongCard key={song.id} song={song} onClick={() => playTrack(song, searchResults)} />
                 ))}
             </div>
         </div>
