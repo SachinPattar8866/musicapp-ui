@@ -1,3 +1,7 @@
+Deployed Application
+You can view the live application here: https://monumental-tartufo-662bb6.netlify.app/
+
+
 # MusicApp UI
 
 This is the frontend for MusicApp, a modern music streaming platform. Built with **React** and **Vite**, it provides a fast, responsive, and user-friendly interface for Browse, playing, and managing music.
