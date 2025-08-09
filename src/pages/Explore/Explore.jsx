@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import SongCard from '../../components/Songcard/SongCard';
+import { useContext } from 'react';
+import { PlayerContext } from '../../context/PlayerContext';
 import styles from './Explore.module.css';
 import api from '../../services/api';
 
 const Explore = () => {
+  const { playTrack } = useContext(PlayerContext);
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,7 +38,7 @@ const Explore = () => {
       {error && <div className={styles.error}>{error}</div>}
       <div className={styles.grid}>
         {songs.map(song => (
-          <SongCard key={song.id} song={song} />
+          <SongCard key={song.id} song={song} onClick={() => playTrack(song, songs)} />
         ))}
       </div>
     </div>
